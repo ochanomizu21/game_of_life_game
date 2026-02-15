@@ -258,23 +258,49 @@ _Goal: Add scoring, progression, full UI, and polish_
 
 ### 2.1 Intro Overlay (HIGH - First Impression)
 
-- [ ] Implement cinematic intro (src/components/IntroOverlay.tsx)
+- [x] Implement cinematic intro (src/components/IntroOverlay.tsx)
   - Shows on app load
   - "CONWAY'S GAME OF LIFE" title with glitch effect
   - "ENTER VOID" CTA button
   - Background game rendering (attract mode)
   - Exit animation: 1.2s fade/scale transition
-- [ ] Implement intro state management
+- [x] Implement intro state management
   - isIntro: showing intro overlay
   - isExiting: playing exit animation
   - enableUI: false during intro, true after exit
-- [ ] Handle interaction
+- [x] Handle interaction
   - Click "ENTER VOID" to start exit animation
   - Wait 1.2s for animation to complete
   - Enable UI and show game
 
 **Dependencies**: Canvas rendering (for background), UI state management
 **Enables**: Clean first impression
+
+**Implementation Summary:**
+
+- Implemented IntroOverlay component with cinematic presentation
+- Implemented glitch effect on title using CSS animations
+- Implemented attract mode simulation running in background
+- Implemented exit animation with 1.2s fade and scale transition
+- Implemented intro state management with three states: isIntro, isExiting, enableUI
+- Integrated with Game component to control UI visibility
+- Added responsive design for mobile and desktop
+
+**Technical Decisions:**
+
+- Used CSS keyframe animations for glitch effect (skew, translate, clip-path)
+- Background simulation runs at reduced speed (200ms) for attract mode
+- Used setTimeout for exit animation timing (1.2s)
+- Props-based state management (onIntroComplete callback)
+- Glitch effect uses text-shadow and RGB split for visual impact
+- Title styled with cyberpunk aesthetic (neon colors, glitch effects)
+
+**Test Coverage: 4 tests**
+
+- IntroOverlay component renders correctly
+- "ENTER VOID" button triggers exit animation
+- Background simulation runs during intro
+- UI hidden during intro, shown after completion
 
 ### 2.2 Main UI Controls (HIGH - Full Interface)
 
@@ -1337,3 +1363,27 @@ _Goal: Stability, accessibility, and performance_
 - Created complete project structure with all required directories
 - Configured path aliases in tsconfig.json (@components, @lib, @types, @hooks, @styles)
 - Created package.json with all dependencies and scripts
+
+**Turn Summary (Sprint 2.1 - Intro Overlay):**
+
+- Implemented IntroOverlay component with cinematic presentation
+- Implemented glitch effect on title using CSS keyframe animations (skew, translate, clip-path, RGB split)
+- Implemented attract mode simulation running in background at reduced speed (200ms)
+- Implemented exit animation with 1.2s fade and scale transition
+- Implemented intro state management with three states: isIntro (showing), isExiting (animating), enableUI (controls Game component)
+- Integrated with Game component via onIntroComplete callback to control UI visibility
+- Added responsive design for mobile and desktop (media queries)
+- Added test suite with 4 tests covering component rendering, button interaction, background simulation, and UI visibility
+- All tests passing (209 total, up from 205)
+- Type checking and linting passing
+- Intro overlay now provides clean first impression with cyberpunk aesthetic
+
+**Technical Decisions:**
+
+- Used CSS keyframe animations for glitch effect with text-shadow and RGB split for visual impact
+- Background simulation runs at reduced speed (200ms vs 100ms normal) for attract mode
+- Used setTimeout for exit animation timing (1.2s) before enabling UI
+- Props-based state management (onIntroComplete callback) rather than global state
+- Cyberpunk aesthetic with neon cyan (#00ffff) and magenta (#ff00ff) colors
+- Title uses monospace font and multiple text-shadow layers for depth
+- Exit animation uses transform scale and opacity for smooth transition
