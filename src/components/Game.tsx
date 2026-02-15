@@ -1,23 +1,26 @@
 import { useState, useCallback, useEffect, useRef } from 'react'
 import { createGrid, GRID_SIZE_PRESETS, type GridSizePreset } from '../lib/simulation'
-import { type GridType, type FluxState, type InteractionMode, type TrackedCluster } from '../types'
+import {
+  type GridType,
+  type FluxState,
+  type InteractionMode,
+  type TrackedCluster,
+  type ExpertSettings,
+} from '../types'
 import { createInitialFluxState } from '../lib/flux'
 import { GridInteraction } from './GridInteraction'
 import { usePhaseTimer } from '../hooks/usePhaseTimer'
 import { stepSimulation, CONWAY_RULES } from '../lib/simulation'
-import {
-  findConnectedComponents,
-  trackClusters,
-  createInitialMovementDetectionParams,
-} from '../lib/movement'
-import {
-  createInitialScoreState,
-  createInitialScoringConfig,
-  updateScore,
-  calculateGenerationScore,
-} from '../lib/scoring'
+import { findConnectedComponents, trackClusters } from '../lib/movement'
+import { createInitialScoreState, updateScore, calculateGenerationScore } from '../lib/scoring'
 import { ScoreDisplay } from './ScoreDisplay'
 import { GlassHUD } from './GlassHUD'
+import { SettingsPanel } from './SettingsPanel'
+import {
+  createInitialExpertSettings,
+  saveToLocalStorage,
+  loadFromLocalStorage,
+} from '../lib/settings'
 
 export function Game() {
   const [gridPreset, setGridPreset] = useState<GridSizePreset>('SMALL')
@@ -27,12 +30,20 @@ export function Game() {
   const [interactionMode, setInteractionMode] = useState<InteractionMode>('DRAW')
   const [generation, setGeneration] = useState(0)
   const [scoreState, setScoreState] = useState(() => createInitialScoreState())
+  const [settingsPanelOpen, setSettingsPanelOpen] = useState(false)
+  const [expertSettings, setExpertSettings] = useState<ExpertSettings>(() => {
+    const saved = loadFromLocalStorage<ExpertSettings>(
+      'gol-expert-settings',
+      createInitialExpertSettings()
+    )
+    return saved
+  })
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
   const simulationSpeed = 200
 
-  const movementConfig = createInitialMovementDetectionParams()
-  const scoringConfig = createInitialScoringConfig()
+  const movementConfig = expertSettings.movementDetection
+  const scoringConfig = expertSettings.scoring
 
   const [previousScore, setPreviousScore] = useState(0)
 
@@ -133,7 +144,12 @@ export function Game() {
   const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
 
   const handleToggleSettings = useCallback(() => {
-    console.log('Settings panel toggled (not yet implemented)')
+    setSettingsPanelOpen((prev) => !prev)
+  }, [])
+
+  const handleUpdateSettings = useCallback((newSettings: ExpertSettings) => {
+    setExpertSettings(newSettings)
+    saveToLocalStorage('gol-expert-settings', newSettings)
   }, [])
 
   const handleStep = useCallback(() => {
@@ -161,6 +177,13 @@ export function Game() {
         score={scoreState.currentScore}
         previousScore={previousScore}
         showPatternBreakdown={false}
+      />
+
+      <SettingsPanel
+        isOpen={settingsPanelOpen}
+        settings={expertSettings}
+        onClose={() => setSettingsPanelOpen(false)}
+        onUpdateSettings={handleUpdateSettings}
       />
 
       <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#61dafb' }}>
