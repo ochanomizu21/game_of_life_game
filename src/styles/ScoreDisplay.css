@@ -1,0 +1,137 @@
+.score-display-container {
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  pointer-events: none;
+}
+
+.score-display {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 0.8rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.3rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  min-width: 120px;
+}
+
+.score-value {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #61dafb;
+  font-family: 'Courier New', monospace;
+  text-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+  transition: all 0.2s ease;
+}
+
+.score-label {
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.7);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+}
+
+.score-value.pulse {
+  animation: pulse 0.2s ease-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    color: #61dafb;
+  }
+  50% {
+    transform: scale(1.1);
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+  }
+  100% {
+    transform: scale(1);
+    color: #61dafb;
+  }
+}
+
+.score-value.milestone-flash {
+  animation: milestoneFlash 0.5s ease-out;
+}
+
+@keyframes milestoneFlash {
+  0% {
+    transform: scale(1);
+    color: #61dafb;
+    text-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+  }
+  25% {
+    transform: scale(1.2);
+    color: #ffff00;
+    text-shadow: 0 0 30px rgba(255, 255, 0, 1);
+  }
+  50% {
+    transform: scale(1.15);
+    color: #ff00ff;
+    text-shadow: 0 0 25px rgba(255, 0, 255, 0.9);
+  }
+  100% {
+    transform: scale(1);
+    color: #61dafb;
+    text-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+  }
+}
+
+.score-breakdown {
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 8px;
+  padding: 0.6rem;
+  margin-top: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  font-size: 0.8rem;
+}
+
+.score-breakdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+}
+
+.breakdown-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.breakdown-value {
+  color: #61dafb;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+@media (max-width: 768px) {
+  .score-display-container {
+    top: 10px;
+    left: 10px;
+  }
+
+  .score-display {
+    padding: 0.6rem 1rem;
+    min-width: 100px;
+  }
+
+  .score-value {
+    font-size: 2rem;
+  }
+
+  .score-label {
+    font-size: 0.7rem;
+  }
+
+  .score-breakdown {
+    padding: 0.4rem;
+    font-size: 0.7rem;
+  }
+}

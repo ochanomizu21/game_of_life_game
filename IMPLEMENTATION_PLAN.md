@@ -425,7 +425,7 @@ _Goal: Add scoring, progression, full UI, and polish_
   - currentScore, generationScore, totalPatternsTracked
   - Score cap at MAX_SAFE_INTEGER (9,007,199,254,740,991)
   - Reset to 0 at start of each level (no carry-over)
-- [ ] Implement score display
+- [x] Implement score display
   - Top-left of screen with "PTS" label
   - Smooth increment animation (lerp 0.2s)
   - Brief pulse/flash on point gain
@@ -455,6 +455,13 @@ _Goal: Add scoring, progression, full UI, and polish_
 - Implemented `createInitialScoreState` and `createInitialScoringConfig` for initialization
 - Implemented `formatScore` for display (K/M suffixes)
 - Implemented `calculateMilestone` and `isMilestoneReached` for milestone detection
+- Implemented ScoreDisplay component with PTS label and animations
+- Implemented smooth increment animation using requestAnimationFrame with easing function
+- Implemented pulse animation on score gain (0.2s duration)
+- Implemented milestone flash animation on every 100 points (0.5s duration, multi-color effect)
+- Implemented optional pattern breakdown UI (Movers, Oscillators, Rate)
+- Added glassmorphism styling matching other UI components
+- Fixed positioning at top-left of screen with responsive design
 
 **Technical Decisions:**
 
@@ -462,6 +469,11 @@ _Goal: Add scoring, progression, full UI, and polish_
 - Multiplier applied before rounding (Math.round) for fair fractional scaling
 - FormatScore uses K/M suffixes for large numbers (1K, 1.5M)
 - Milestone detection in 100-point increments
+- Score display uses window.requestAnimationFrame for smooth animations
+- Previous score tracking via ref to prevent unnecessary re-renders
+- CSS keyframe animations for pulse (scale + color change) and milestone flash (multi-color effect)
+- Easing function: ease-in-out quadratic for smooth transitions
+- Pattern breakdown optional via prop for future integration
 - Score state immutable (returns new state objects)
 - Reset function creates fresh state for clean level transitions
 
