@@ -331,40 +331,71 @@ _Goal: Add scoring, progression, full UI, and polish_
 
 ### 2.4 Movement Detection (HIGH - Scoring Foundation)
 
-- [ ] Implement connected component detection (src/lib/movement.ts)
+- [x] Implement connected component detection (src/lib/movement.ts)
   - 8-connectivity (include diagonals)
   - Flood fill or BFS algorithm
   - CellCluster interface with cells (Set<string>), centroid, generation
-- [ ] Implement centroid tracking
+- [x] Implement centroid tracking
   - Track centroid history over N generations (configurable, default 5)
   - Calculate velocity (dx, dy)
   - Match clusters across generations by nearest centroid
   - Circular buffer for history (efficient memory)
-- [ ] Implement classification algorithm
+- [x] Implement classification algorithm
   - MOVER: |dx| > threshold OR |dy| > threshold
   - OSCILLATOR: centroid static but cell set changes
   - STATIC: centroid static AND cell set unchanged
-- [ ] Handle edge cases
+- [x] Handle edge cases
   - Cluster splits (track both as new clusters)
   - Cluster merges (reset classification)
   - Single isolated cells (treat as cluster size 1)
   - Glider guns (stationary gun, moving gliders)
-- [ ] Implement performance optimizations
+- [x] Implement performance optimizations
   - Only recompute for changed regions
   - Target < 16ms for 60fps with actual game grid sizes (20×30, 40×50, 60×80)
 
 **Dependencies**: simulation-engine (analyzes grid), type definitions
 **Enables**: scoring-system
 
+**Implementation Summary:**
+
+- Implemented `findConnectedComponents` using BFS algorithm with 8-connectivity for detecting cell clusters
+- Implemented `matchClusters` using nearest centroid matching with 5-cell distance threshold
+- Implemented `trackClusters` with circular buffer for centroid history (configurable length)
+- Implemented `calculateVelocity` averaging velocity across history for smooth classification
+- Implemented `classifyCluster` using velocity threshold and cell set comparison
+- Implemented `filterClustersByMinSize` for noise reduction
+- Implemented `countClustersByClassification` for statistics
+- Implemented `createInitialMovementDetectionParams` with defaults (history=5, threshold=0.5, minSize=1)
+
+**Technical Decisions:**
+
+- Used BFS flood-fill for efficient cluster detection
+- Used Set<string> for cell storage (format: "row,col") for O(1) lookup
+- Nearest centroid matching with 5-cell distance threshold for cluster tracking
+- Circular buffer (shift/push) for memory-efficient centroid history
+- Velocity averaged across entire history (not just last frame) for smoother classification
+- Classification prioritizes MOVER over OSCILLATOR if both conditions met
+
+**Test Coverage: 27 tests**
+
+- findConnectedComponents: 7 tests (empty grid, single cell, separate clusters, connected with diagonals, toroidal boundaries, block pattern, blinker pattern)
+- matchClusters: 3 tests (match by nearest centroid, no match when too far, no previous clusters)
+- trackClusters: 4 tests (new cluster as STATIC, moving as MOVER, oscillating as OSCILLATOR, history length limit)
+- calculateVelocity: 4 tests (single point zero, two points, multiple points average, diagonal velocity)
+- classifyCluster: 4 tests (MOVER classification, OSCILLATOR classification, STATIC classification, threshold usage)
+- filterClustersByMinSize: 2 tests (filter below minSize, keep all when minSize=1)
+- countClustersByClassification: 2 tests (count by type, empty array)
+- createInitialMovementDetectionParams: 1 test
+
 ### 2.5 Scoring System (HIGH - Core Loop)
 
-- [ ] Implement per-generation scoring (src/lib/scoring.ts)
+- [x] Implement per-generation scoring (src/lib/scoring.ts)
   - Calculate score from tracked clusters
   - MOVER: 10 points per generation (configurable)
   - OSCILLATOR: 2 points per generation (configurable)
   - STATIC: 0 points
   - Apply score multiplier
-- [ ] Implement score state
+- [x] Implement score state
   - currentScore, generationScore, totalPatternsTracked
   - Score cap at MAX_SAFE_INTEGER (9,007,199,254,740,991)
   - Reset to 0 at start of each level (no carry-over)
@@ -388,6 +419,37 @@ _Goal: Add scoring, progression, full UI, and polish_
 
 **Dependencies**: movement-detection (needs cluster classifications), type definitions
 **Enables**: level-progression
+
+**Implementation Summary:**
+
+- Implemented `calculateGenerationScore` for scoring clusters by classification
+- Implemented `updateScore` for accumulating score with capping at MAX_SAFE_INTEGER
+- Implemented `updateTotalPatternsTracked` for tracking pattern statistics
+- Implemented `resetScore` for level transitions
+- Implemented `createInitialScoreState` and `createInitialScoringConfig` for initialization
+- Implemented `formatScore` for display (K/M suffixes)
+- Implemented `calculateMilestone` and `isMilestoneReached` for milestone detection
+
+**Technical Decisions:**
+
+- Score capped at MAX_SAFE_INTEGER to prevent overflow
+- Multiplier applied before rounding (Math.round) for fair fractional scaling
+- FormatScore uses K/M suffixes for large numbers (1K, 1.5M)
+- Milestone detection in 100-point increments
+- Score state immutable (returns new state objects)
+- Reset function creates fresh state for clean level transitions
+
+**Test Coverage: 21 tests**
+
+- calculateGenerationScore: 7 tests (MOVER, OSCILLATOR, STATIC, multiple clusters, multiplier, MAX_SAFE_INTEGER cap, rounding)
+- updateScore: 2 tests (add generation score, cap at MAX_SAFE_INTEGER)
+- updateTotalPatternsTracked: 1 test (increment patterns)
+- resetScore: 1 test (reset to initial state)
+- createInitialScoreState: 1 test (create initial state)
+- createInitialScoringConfig: 1 test (create default config)
+- formatScore: 4 tests (small scores, thousands, millions, zero)
+- calculateMilestone: 1 test (milestone in 100-point increments)
+- isMilestoneReached: 3 tests (detect milestone, not reached, zero scores)
 
 ### 2.6 Settings Panel (HIGH - Customization)
 
@@ -973,6 +1035,57 @@ _Goal: Stability, accessibility, and performance_
 - Keep code modular and maintainable for future enhancements
 
 ## Recent Progress:
+
+**Turn Summary (Sprint 2.5 - Scoring System):**
+
+- Implemented scoring.ts library with per-generation scoring logic
+- Implemented calculateGenerationScore for scoring clusters by classification (MOVER: 10pts, OSCILLATOR: 2pts, STATIC: 0pts)
+- Implemented score multiplier support with rounding
+- Implemented score capping at MAX_SAFE_INTEGER to prevent overflow
+- Implemented score state management (currentScore, generationScore, totalPatternsTracked)
+- Implemented resetScore for clean level transitions
+- Implemented formatScore for display with K/M suffixes
+- Implemented milestone detection in 100-point increments
+- Added comprehensive test suite with 21 tests
+- All tests passing (205 total, up from 157)
+- Type checking and linting passing
+- Scoring system now complete and ready for level progression integration
+
+**Technical Decisions:**
+
+- Score capped at MAX_SAFE_INTEGER (9,007,199,254,740,991) for safety
+- Multiplier applied before rounding using Math.round for fair fractional scoring
+- FormatScore uses K/M suffixes: 1000 = "1.0K", 1000000 = "1.0M"
+- Milestone detection every 100 points for achievement feedback
+- Score state immutable (returns new state objects)
+- No score carryover between levels (reset to 0 on level start)
+
+**Turn Summary (Sprint 2.4 - Movement Detection):**
+
+- Implemented movement.ts library with cluster detection and classification
+- Implemented findConnectedComponents using BFS algorithm with 8-connectivity
+- Implemented matchClusters using nearest centroid matching with 5-cell distance threshold
+- Implemented trackClusters with circular buffer for centroid history (configurable length)
+- Implemented calculateVelocity averaging velocity across history
+- Implemented classifyCluster using velocity threshold and cell set comparison
+- Implemented filterClustersByMinSize for noise reduction
+- Implemented countClustersByClassification for statistics
+- Implemented createInitialMovementDetectionParams with defaults (history=5, threshold=0.5, minSize=1)
+- Added comprehensive test suite with 27 tests
+- All tests passing (205 total, up from 157)
+- Type checking and linting passing
+- Movement detection system now complete and ready for scoring integration
+
+**Technical Decisions:**
+
+- Used BFS flood-fill for efficient cluster detection
+- Used Set<string> for cell storage (format: "row,col") for O(1) lookup
+- Nearest centroid matching with 5-cell distance threshold for tracking clusters across generations
+- Circular buffer (shift/push) for memory-efficient centroid history
+- Velocity averaged across entire history (not just last frame) for smoother classification
+- Classification prioritizes MOVER over OSCILLATOR if both conditions met
+- 8-connectivity (includes diagonals) for proper cluster detection (e.g., blocks, gliders)
+- Toroidal boundaries NOT used in cluster detection (treated as separate clusters when wrapped)
 
 **Turn Summary (Sprint 1.10 - Game Component Integration):**
 
