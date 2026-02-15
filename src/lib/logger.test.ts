@@ -1,17 +1,7 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { Logger, logger } from './logger'
+import { describe, it, expect, vi } from 'vitest'
+import { Logger, logger, type LogLevel } from './logger'
 
 describe('Logger', () => {
-  let consoleSpy: ReturnType<typeof vi.spyOn>
-
-  beforeEach(() => {
-    consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-  })
-
-  afterEach(() => {
-    consoleSpy.mockRestore()
-  })
-
   describe('getInstance', () => {
     it('should return singleton instance', () => {
       const instance1 = Logger.getInstance()
@@ -127,7 +117,11 @@ describe('Logger', () => {
   describe('formatMessage', () => {
     it('should format message with all components', () => {
       const instance = Logger.getInstance()
-      const message = (instance as any).formatMessage('debug', 'Test message', 'Context')
+      const message = (
+        instance as unknown as {
+          formatMessage: (level: LogLevel, message: string, context?: string) => string
+        }
+      ).formatMessage('debug', 'Test message', 'Context')
 
       expect(message).toMatch(/\[\d{4}-\d{2}-\d{2}T[\d:.]+Z\]/)
       expect(message).toContain('[DEBUG]')
@@ -137,7 +131,11 @@ describe('Logger', () => {
 
     it('should format message without context', () => {
       const instance = Logger.getInstance()
-      const message = (instance as any).formatMessage('info', 'Test message')
+      const message = (
+        instance as unknown as {
+          formatMessage: (level: LogLevel, message: string, context?: string) => string
+        }
+      ).formatMessage('info', 'Test message')
 
       expect(message).toContain('[INFO]')
       expect(message).toContain('Test message')

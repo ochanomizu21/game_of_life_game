@@ -1,4 +1,4 @@
-import type { GamePhase } from '@types'
+import type { GamePhase } from '../types'
 
 export interface PhaseState {
   current: GamePhase

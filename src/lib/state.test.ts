@@ -40,7 +40,7 @@ describe('createReducer', () => {
       DECREMENT: (state) => ({ ...state, count: state.count - 1 }),
     })
 
-    expect(reducer(initialState as any, increment())).toEqual({ count: 1 })
+    expect(reducer(initialState as { count: number }, increment())).toEqual({ count: 1 })
     expect(reducer({ count: 1 }, decrement())).toEqual({ count: 0 })
   })
 
@@ -89,11 +89,12 @@ describe('combineReducers', () => {
 
     const rootReducer = combineReducers({ counter, text })
 
-    expect(rootReducer({ counter: 0, text: '' } as any, { type: 'INIT' })).toEqual({
+    const initialState = { counter: 0, text: '' }
+    expect(rootReducer(initialState as Record<string, unknown>, { type: 'INIT' })).toEqual({
       counter: 0,
       text: '',
     })
-    expect(rootReducer({ counter: 0, text: '' } as any, { type: 'INC' })).toEqual({
+    expect(rootReducer(initialState as Record<string, unknown>, { type: 'INC' })).toEqual({
       counter: 1,
       text: '',
     })
@@ -160,6 +161,7 @@ describe('localStorage helpers', () => {
   beforeEach(() => {
     try {
       localStorage.clear()
+      // eslint-disable-next-line no-empty
     } catch {}
   })
 
@@ -208,7 +210,7 @@ describe('localStorage helpers', () => {
     })
 
     it('should handle errors gracefully', () => {
-      const getItemSpy = vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      const getItemSpy = vi.spyOn(localStorage, 'getItem').mockImplementation(() => {
         throw new Error('Storage error')
       })
 

@@ -227,7 +227,7 @@ describe('phaseReducer', () => {
   })
 
   it('should ignore unknown actions', () => {
-    const action = { type: 'UNKNOWN_ACTION' as const } as PhaseAction
+    const action = { type: 'UNKNOWN_ACTION' } as unknown as PhaseAction
     const newState = phaseReducer(initialState, action, true)
 
     expect(newState).toEqual(initialState)
