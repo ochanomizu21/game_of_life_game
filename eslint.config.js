@@ -30,6 +30,7 @@ export default [
         beforeEach: 'readonly',
         afterEach: 'readonly',
         vi: 'readonly',
+        HTMLCanvasElement: 'readonly',
       },
     },
     plugins: {
