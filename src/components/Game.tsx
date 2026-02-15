@@ -1,25 +1,34 @@
 import { useState, useCallback } from 'react'
 import { createGrid, GRID_SIZE_PRESETS, type GridSizePreset } from '../lib/simulation'
-import { type GridType, type FluxState, type GamePhase, type InteractionMode } from '../types'
+import { type GridType, type FluxState, type InteractionMode } from '../types'
 import { createInitialFluxState } from '../lib/flux'
 import { GridInteraction } from './GridInteraction'
+import { usePhaseTimer } from '../hooks/usePhaseTimer'
+import { stepSimulation, CONWAY_RULES } from '../lib/simulation'
 
 export function Game() {
   const [gridPreset, setGridPreset] = useState<GridSizePreset>('SMALL')
   const [grid, setGrid] = useState<GridType>(() => createGrid(20, 30))
   const [flux, setFlux] = useState<FluxState>(() => createInitialFluxState(20))
-  const [phase, setPhase] = useState<GamePhase>('PLANNING')
   const [showGridLines, setShowGridLines] = useState(true)
   const [interactionMode, setInteractionMode] = useState<InteractionMode>('DRAW')
+  const [generation, setGeneration] = useState(0)
+
+  const hasCells = useCallback(() => {
+    return grid.flat().filter((cell: number) => cell > 0).length > 0
+  }, [grid])
+
+  const { phaseState, startCountdown } = usePhaseTimer(hasCells)
 
   const handleStart = useCallback(() => {
-    if (phase === 'PLANNING') {
-      setPhase('COUNTDOWN')
+    if (phaseState.current === 'PLANNING' && hasCells()) {
+      startCountdown()
     }
-  }, [phase])
+  }, [phaseState, startCountdown, hasCells])
 
   const handleGridChange = useCallback((newGrid: GridType) => {
     setGrid(newGrid)
+    setGeneration(0)
   }, [])
 
   const handleFluxChange = useCallback((newFlux: FluxState) => {
@@ -30,7 +39,7 @@ export function Game() {
     const { rows, cols } = GRID_SIZE_PRESETS[gridPreset]
     setGrid(createGrid(rows, cols))
     setFlux(createInitialFluxState(20))
-    setPhase('PLANNING')
+    setGeneration(0)
   }, [gridPreset])
 
   const handleRandom = useCallback(() => {
@@ -48,10 +57,26 @@ export function Game() {
 
     setGrid(newGrid)
     setFlux(createInitialFluxState(20))
-    setPhase('PLANNING')
+    setGeneration(0)
   }, [gridPreset])
 
   const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
+
+  const handleStep = useCallback(() => {
+    if (phaseState.current !== 'PLANNING') return
+
+    const currentState = {
+      grid,
+      generation,
+      running: false,
+      speed: 100,
+      selectedRule: CONWAY_RULES,
+    }
+
+    const result = stepSimulation(currentState)
+    setGrid(result.newGrid)
+    setGeneration(result.newGeneration)
+  }, [phaseState, grid, generation])
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#0a0a0f', minHeight: '100vh', color: '#fff' }}>
@@ -63,13 +88,22 @@ export function Game() {
         <div
           style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}
         >
-          <button onClick={() => setGridPreset('SMALL')} disabled={phase !== 'PLANNING'}>
+          <button
+            onClick={() => setGridPreset('SMALL')}
+            disabled={phaseState.current !== 'PLANNING'}
+          >
             Small
           </button>
-          <button onClick={() => setGridPreset('MEDIUM')} disabled={phase !== 'PLANNING'}>
+          <button
+            onClick={() => setGridPreset('MEDIUM')}
+            disabled={phaseState.current !== 'PLANNING'}
+          >
             Medium
           </button>
-          <button onClick={() => setGridPreset('LARGE')} disabled={phase !== 'PLANNING'}>
+          <button
+            onClick={() => setGridPreset('LARGE')}
+            disabled={phaseState.current !== 'PLANNING'}
+          >
             Large
           </button>
         </div>
@@ -77,13 +111,19 @@ export function Game() {
         <div
           style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}
         >
-          <button onClick={handleStart} disabled={phase !== 'PLANNING' || aliveCount === 0}>
-            {phase === 'PLANNING' ? 'Start' : 'Running'}
+          <button onClick={handleStep} disabled={phaseState.current !== 'PLANNING'}>
+            STEP
           </button>
-          <button onClick={handleClear} disabled={phase !== 'PLANNING'}>
+          <button
+            onClick={handleStart}
+            disabled={phaseState.current !== 'PLANNING' || aliveCount === 0}
+          >
+            {phaseState.current === 'PLANNING' ? 'Start' : 'Running'}
+          </button>
+          <button onClick={handleClear} disabled={phaseState.current !== 'PLANNING'}>
             Clear
           </button>
-          <button onClick={handleRandom} disabled={phase !== 'PLANNING'}>
+          <button onClick={handleRandom} disabled={phaseState.current !== 'PLANNING'}>
             Random
           </button>
         </div>
@@ -91,7 +131,10 @@ export function Game() {
         <div
           style={{ display: 'flex', justifyContent: 'center', gap: '10px', marginBottom: '10px' }}
         >
-          <button onClick={() => setShowGridLines(!showGridLines)} disabled={phase !== 'PLANNING'}>
+          <button
+            onClick={() => setShowGridLines(!showGridLines)}
+            disabled={phaseState.current !== 'PLANNING'}
+          >
             {showGridLines ? 'Hide Grid' : 'Show Grid'}
           </button>
         </div>
@@ -101,14 +144,14 @@ export function Game() {
         >
           <button
             onClick={() => setInteractionMode('DRAW')}
-            disabled={phase !== 'PLANNING'}
+            disabled={phaseState.current !== 'PLANNING'}
             style={{ backgroundColor: interactionMode === 'DRAW' ? '#61dafb' : '#1a1a1a' }}
           >
             Draw
           </button>
           <button
             onClick={() => setInteractionMode('ERASE')}
-            disabled={phase !== 'PLANNING'}
+            disabled={phaseState.current !== 'PLANNING'}
             style={{ backgroundColor: interactionMode === 'ERASE' ? '#61dafb' : '#1a1a1a' }}
           >
             Erase
@@ -127,7 +170,10 @@ export function Game() {
             backdropFilter: 'blur(10px)',
           }}
         >
-          <div>Phase: {phase}</div>
+          <div>Phase: {phaseState.current}</div>
+          {phaseState.current === 'COUNTDOWN' && <div>Countdown: {phaseState.countdownValue}</div>}
+          {phaseState.current === 'RUNNING' && <div>Timer: {phaseState.timerRemaining}s</div>}
+          <div>GEN: {generation}</div>
           <div>Cells: {aliveCount}</div>
           <div
             style={{
@@ -143,7 +189,7 @@ export function Game() {
         <GridInteraction
           grid={grid}
           flux={flux}
-          phase={phase}
+          phase={phaseState.current}
           showGridLines={showGridLines}
           onGridChange={handleGridChange}
           onFluxChange={handleFluxChange}

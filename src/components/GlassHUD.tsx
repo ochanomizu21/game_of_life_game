@@ -1,0 +1,144 @@
+import type { GamePhase, InteractionMode } from '../types'
+import type { GridSizePreset } from '../lib/simulation'
+import '../styles/GlassHUD.css'
+
+interface GlassHUDProps {
+  phase: GamePhase
+  aliveCount: number
+  flux: number
+  fluxMax: number
+  interactionMode: InteractionMode
+  gridPreset: GridSizePreset
+  showGridLines: boolean
+  canStart: boolean
+  canInteract: boolean
+  onStart: () => void
+  onClear: () => void
+  onRandom: () => void
+  onToggleGrid: () => void
+  onSetMode: (mode: InteractionMode) => void
+  onSetGridPreset: (preset: GridSizePreset) => void
+  onToggleSettings: () => void
+}
+
+export function GlassHUD({
+  phase,
+  aliveCount,
+  flux,
+  fluxMax,
+  interactionMode,
+  gridPreset,
+  showGridLines,
+  canStart,
+  canInteract,
+  onStart,
+  onClear,
+  onRandom,
+  onToggleGrid,
+  onSetMode,
+  onSetGridPreset,
+  onToggleSettings,
+}: GlassHUDProps) {
+  const getFluxColor = (current: number, max: number): string => {
+    const ratio = current / max
+    if (ratio <= 0) return 'red'
+    if (ratio < 0.3) return 'orange'
+    if (ratio < 0.5) return 'orange'
+    return 'green'
+  }
+
+  const fluxColor = getFluxColor(flux, fluxMax)
+
+  return (
+    <div className="glass-hud-container">
+      <div className="glass-hud">
+        <div className="hud-controls">
+          <div className="hud-group">
+            <button
+              className="hud-button active"
+              onClick={onStart}
+              disabled={!canStart || !canInteract}
+            >
+              {phase === 'PLANNING' ? 'START' : 'RUNNING'}
+            </button>
+            <button className="hud-button" onClick={onRandom} disabled={!canInteract}>
+              RANDOM
+            </button>
+            <button
+              className="hud-button hud-button-danger"
+              onClick={onClear}
+              disabled={!canInteract}
+            >
+              CLEAR
+            </button>
+          </div>
+
+          <div className="hud-group">
+            <button
+              className={`hud-button ${interactionMode === 'DRAW' ? 'active' : ''}`}
+              onClick={() => onSetMode('DRAW')}
+              disabled={!canInteract}
+            >
+              DRAW
+            </button>
+            <button
+              className={`hud-button ${interactionMode === 'ERASE' ? 'active' : ''}`}
+              onClick={() => onSetMode('ERASE')}
+              disabled={!canInteract}
+            >
+              ERASE
+            </button>
+          </div>
+
+          <div className="hud-group">
+            <button
+              className={`hud-button ${gridPreset === 'SMALL' ? 'active' : ''}`}
+              onClick={() => onSetGridPreset('SMALL')}
+              disabled={!canInteract}
+            >
+              Small
+            </button>
+            <button
+              className={`hud-button ${gridPreset === 'MEDIUM' ? 'active' : ''}`}
+              onClick={() => onSetGridPreset('MEDIUM')}
+              disabled={!canInteract}
+            >
+              Medium
+            </button>
+            <button
+              className={`hud-button ${gridPreset === 'LARGE' ? 'active' : ''}`}
+              onClick={() => onSetGridPreset('LARGE')}
+              disabled={!canInteract}
+            >
+              Large
+            </button>
+          </div>
+
+          <div className="hud-group">
+            <button className="hud-button" onClick={onToggleGrid} disabled={!canInteract}>
+              {showGridLines ? 'Hide Grid' : 'Show Grid'}
+            </button>
+            <button className="hud-button" onClick={onToggleSettings}>
+              ⚙️
+            </button>
+          </div>
+
+          <div className="hud-status">
+            <div className="hud-status-item">
+              <span className="hud-status-label">Phase:</span>
+              <span className="hud-status-value">{phase}</span>
+            </div>
+            <div className="hud-status-item">
+              <span className="hud-status-label">Cells:</span>
+              <span className="hud-status-value">{aliveCount}</span>
+            </div>
+            <div className="hud-status-item">
+              <span className="hud-status-label">Flux:</span>
+              <span className={`hud-status-value ${fluxColor}`}>{flux}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}

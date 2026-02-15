@@ -1,0 +1,244 @@
+.glass-hud {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  color: #fff;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.glass-hud-container {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  max-width: 90vw;
+  width: fit-content;
+}
+
+.hud-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.hud-group {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.hud-button {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.6em 1.2em;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 80px;
+}
+
+.hud-button:hover:not(:disabled) {
+  background: rgba(97, 218, 251, 0.2);
+  border-color: #61dafb;
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
+}
+
+.hud-button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.hud-button.active {
+  background: rgba(97, 218, 251, 0.3);
+  border-color: #61dafb;
+  box-shadow: 0 0 15px rgba(97, 218, 251, 0.4);
+}
+
+.hud-button-danger {
+  color: #ff4444;
+}
+
+.hud-button-danger:hover:not(:disabled) {
+  background: rgba(255, 68, 68, 0.2);
+  border-color: #ff4444;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
+}
+
+.hud-select {
+  background: rgba(26, 26, 26, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 0.6em 1em;
+  color: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-select:hover {
+  border-color: #61dafb;
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
+}
+
+.hud-select option {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+.hud-slider-container {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.hud-slider {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100px;
+  height: 6px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+  outline: none;
+}
+
+.hud-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #61dafb;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.hud-slider::-webkit-slider-thumb:hover {
+  background: #fff;
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+  transform: scale(1.1);
+}
+
+.hud-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #61dafb;
+  border-radius: 50%;
+  cursor: pointer;
+  border: none;
+  transition: all 0.2s ease;
+}
+
+.hud-slider::-moz-range-thumb:hover {
+  background: #fff;
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
+  transform: scale(1.1);
+}
+
+.hud-status {
+  display: flex;
+  gap: 20px;
+  padding: 0.8em 1.2em;
+  background: rgba(26, 26, 46, 0.8);
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-family: monospace;
+}
+
+.hud-status-item {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.hud-status-label {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+.hud-status-value {
+  color: #61dafb;
+  font-weight: bold;
+}
+
+.hud-status-value.green {
+  color: #00ff00;
+}
+
+.hud-status-value.orange {
+  color: #ffaa00;
+}
+
+.hud-status-value.red {
+  color: #ff4444;
+}
+
+.ui-toggle-button {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 10px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 101;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ui-toggle-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: #61dafb;
+  box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
+}
+
+.ui-toggle-button svg {
+  width: 24px;
+  height: 24px;
+}
+
+@media (max-width: 768px) {
+  .glass-hud-container {
+    bottom: 10px;
+  }
+
+  .hud-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .hud-group {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .hud-button,
+  .hud-select {
+    min-width: 70px;
+    padding: 0.5em 1em;
+    font-size: 0.8rem;
+  }
+
+  .hud-slider {
+    width: 80px;
+  }
+
+  .hud-status {
+    font-size: 0.8rem;
+    flex-direction: column;
+    gap: 10px;
+  }
+}

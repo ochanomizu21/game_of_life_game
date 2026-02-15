@@ -121,7 +121,7 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
   - Prevent START button spam
   - No input during COUNTDOWN phase
   - Validate minimum 1 cell before START
-- [ ] Add browser tab handling
+- [x] Add browser tab handling
   - During gameplay: Timer continues running when tab inactive
   - During transitions: Pause timer to prevent level advancing unseen
   - Resume when tab becomes active
@@ -308,9 +308,9 @@ _Goal: Add scoring, progression, full UI, and polish_
   - Semi-transparent glass effect (backdrop-filter: blur(10px))
   - Floating overlay on bottom of screen
   - Groups: Main controls, interaction modes, status
-- [ ] Implement main control buttons
+- [x] Implement main control buttons
   - PLAY/PAUSE toggle
-  - STEP button (disabled while running)
+  - [x] STEP button (disabled while running, only available during PLANNING phase)
   - RANDOM fill (15% density)
   - CLEAR button (red text)
 - [ ] Implement interaction mode buttons
@@ -319,7 +319,7 @@ _Goal: Add scoring, progression, full UI, and polish_
 - [ ] Implement status controls
   - Waveform selector dropdown (Sine, Triangle, Square, Saw)
   - Volume slider (0-0.5, 0.01 step)
-  - Generation counter "GEN: {number}"
+  - [x] Generation counter "GEN: {number}"
   - Settings gear icon button (⚙️)
 - [ ] Implement UI toggle button (src/components/UIToggleButton.tsx)
   - Icon frame in corner
@@ -340,11 +340,11 @@ _Goal: Add scoring, progression, full UI, and polish_
 - [ ] Implement phase indicator
   - Show current phase: PLANNING, COUNTDOWN, RUNNING, FINISHED
   - Prominent display in HUD
-- [ ] Implement timer display
+- [x] Implement timer display
   - Show during COUNTDOWN phase (3... 2... 1...)
   - Show during RUNNING phase (level countdown)
   - Hide during PLANNING and FINISHED phases
-- [ ] Implement countdown display
+- [x] Implement countdown display
   - Large "3... 2... 1..." during COUNTDOWN phase
   - No input allowed during countdown
 - [ ] Implement Flux counter display
@@ -1387,3 +1387,31 @@ _Goal: Stability, accessibility, and performance_
 - Cyberpunk aesthetic with neon cyan (#00ffff) and magenta (#ff00ff) colors
 - Title uses monospace font and multiple text-shadow layers for depth
 - Exit animation uses transform scale and opacity for smooth transition
+
+---
+
+**Recent Progress (Sprint 1.5, 2.2, 2.3):**
+
+**Completed:**
+
+- **Sprint 1.5 - Browser tab handling for phase management**: Added usePhaseTimer hook with Page Visibility API implementation (src/hooks/usePhaseTimer.ts). The hook manages timer execution with setInterval, pauses/resumes based on page visibility, and dispatches phase actions to decrement timers. This ensures proper game behavior when browser tabs are inactive.
+
+- **Sprint 2.2 - Main UI Controls enhancements**: Added STEP button to Game.tsx that executes a single simulation step using stepSimulation(). STEP button is only available during PLANNING phase.
+
+- **Sprint 2.3 - Phase Status Display enhancements**: Added timer display to Game.tsx showing countdown timer (3...2...1...) during COUNTDOWN phase and running timer during RUNNING phase. Also added generation counter displaying "GEN: {number}" in the status display.
+
+- **Updated Game.tsx** to use the full PhaseState from usePhaseTimer hook instead of simple GamePhase string. This enables proper timer management and phase transitions.
+
+**Technical Decisions:**
+
+- Created usePhaseTimer hook with Page Visibility API for browser tab handling
+- Timer pauses when tab becomes hidden, resumes when visible, calculating elapsed time to sync state
+- Added generation tracking state that increments with each step and resets on clear/random
+- STEP button uses existing stepSimulation function which was already implemented but not used
+- All tests passing (228 total)
+
+**Next Steps:**
+
+- Update GlassHUD component to include STEP button and generation counter (optional - Game.tsx already has these)
+- Continue with Sprint 3 (Level Progression & Transitions)
+- Implement audio system (Sprint 4)
