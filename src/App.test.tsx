@@ -1,22 +1,29 @@
-import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { describe, it, expect } from 'vitest'
 import App from './App'
 
 describe('App', () => {
-  it('renders the title', () => {
+  it('renders title', () => {
     render(<App />)
     expect(screen.getByText("Conway's Game of Life")).toBeInTheDocument()
   })
 
-  it('increments count when button is clicked', async () => {
-    const user = userEvent.setup()
+  it('renders game controls', () => {
     render(<App />)
+    expect(screen.getByText('Small')).toBeInTheDocument()
+    expect(screen.getByText('Medium')).toBeInTheDocument()
+    expect(screen.getByText('Large')).toBeInTheDocument()
+    expect(screen.getByText('Start')).toBeInTheDocument()
+    expect(screen.getByText('Clear')).toBeInTheDocument()
+    expect(screen.getByText('Random')).toBeInTheDocument()
+    expect(screen.getByText('Draw')).toBeInTheDocument()
+    expect(screen.getByText('Erase')).toBeInTheDocument()
+  })
 
-    const button = screen.getByRole('button')
-    expect(button).toHaveTextContent('Count is 0')
-
-    await user.click(button)
-    expect(button).toHaveTextContent('Count is 1')
+  it('renders status display', () => {
+    render(<App />)
+    expect(screen.getByText(/Phase:/)).toBeInTheDocument()
+    expect(screen.getByText(/Cells:/)).toBeInTheDocument()
+    expect(screen.getByText(/Flux:/)).toBeInTheDocument()
   })
 })
