@@ -413,6 +413,15 @@ _Goal: Add scoring, progression, full UI, and polish_
 - countClustersByClassification: 2 tests (count by type, empty array)
 - createInitialMovementDetectionParams: 1 test
 
+**Integration Notes (Sprint 2.4 Integration):**
+
+- Integrated movement detection into Game.tsx simulation loop via handleSimulationStep callback
+- Movement detection runs automatically during RUNNING phase at 200ms intervals
+- Connected components detected using BFS algorithm with 8-connectivity
+- Cluster tracking stored in ref (trackedClusters) to avoid re-render issues
+- Classification results passed to scoring system for real-time score calculation
+- All tests passing (240 total)
+
 ### 2.5 Scoring System (HIGH - Core Loop)
 
 - [x] Implement per-generation scoring (src/lib/scoring.ts)
@@ -488,6 +497,19 @@ _Goal: Add scoring, progression, full UI, and polish_
 - formatScore: 4 tests (small scores, thousands, millions, zero)
 - calculateMilestone: 1 test (milestone in 100-point increments)
 - isMilestoneReached: 3 tests (detect milestone, not reached, zero scores)
+
+**Integration Notes (Sprint 2.5 Integration):**
+
+- Integrated scoring system into Game.tsx via handleSimulationStep callback
+- ScoreDisplay component rendered at top-left showing real-time score with PTS label
+- Score updates in real-time during RUNNING phase (every 200ms)
+- Score state managed with React state (scoreState) and previousScore ref for animations
+- Score resets on Clear/Random/phase transitions appropriately
+- previousScore state tracks previous score for ScoreDisplay smooth animations
+- Tracked clusters stored in ref to avoid re-render issues
+- Classification scoring applied: MOVER (10pts), OSCILLATOR (2pts), STATIC (0pts)
+- ScoreDisplay shows smooth animations and milestone flashes every 100 points
+- All tests passing (240 total)
 
 ### 2.6 Settings Panel (HIGH - Customization)
 
@@ -1074,6 +1096,41 @@ _Goal: Stability, accessibility, and performance_
 
 ## Recent Progress:
 
+**Turn Summary (Sprint 2.5 & 2.4 Integration - Game Component Scoring Integration):**
+
+- Integrated movement detection and scoring into Game.tsx simulation loop
+- Added automatic simulation stepping during RUNNING phase (was missing before)
+- Implemented handleSimulationStep callback that:
+  - Steps the simulation using stepSimulation()
+  - Detects connected components using findConnectedComponents()
+  - Tracks clusters across generations using trackClusters()
+  - Calculates score based on cluster classifications using calculateGenerationScore()
+  - Updates all state appropriately (scoreState, trackedClusters, previousScore)
+- Added useEffect that runs simulation loop during RUNNING phase at 200ms intervals
+- Integrated ScoreDisplay component into Game UI at top-left position
+- Added score state management (scoreState, previousScore)
+- Added trackedClusters ref to avoid re-render issues
+- Score now updates in real-time during simulation
+- Score resets on Clear/Random/phase transitions appropriately
+- ScoreDisplay shows smooth increment animations and milestone flashes
+- Added imports for movement detection, scoring, ScoreDisplay components
+- Updated Game.tsx with proper state and callback management
+- All tests passing (240 total)
+- Type checking passes
+- Lint passes for modified files
+
+**Technical Decisions:**
+
+- Simulation runs at 200ms intervals during RUNNING phase via setInterval in useEffect
+- Movement detection uses BFS for cluster finding (findConnectedComponents)
+- Scoring uses cluster classifications: MOVER (10pts), OSCILLATOR (2pts), STATIC (0pts)
+- ScoreDisplay shows smooth animations (lerp 0.2s) and milestone flashes (every 100 points)
+- Tracked clusters stored in ref (trackedClusters) to avoid re-render issues
+- previousScore state tracks previous score for ScoreDisplay animations
+- Score resets on Clear/Random handle functions and phase transitions
+- handleSimulationStep callback integrates all three systems: simulation → movement → scoring
+- Phase-based cleanup: score and tracked clusters reset when phase changes
+
 **Turn Summary (Sprint 2.5 - Scoring System):**
 
 - Implemented scoring.ts library with per-generation scoring logic
@@ -1087,7 +1144,8 @@ _Goal: Stability, accessibility, and performance_
 - Added comprehensive test suite with 21 tests
 - All tests passing (205 total, up from 157)
 - Type checking and linting passing
-- Scoring system now complete and ready for level progression integration
+- Scoring system now complete and integrated into Game component
+- Scoring system integrated with movement detection for real-time score updates (240 total tests passing)
 
 **Technical Decisions:**
 
@@ -1112,7 +1170,8 @@ _Goal: Stability, accessibility, and performance_
 - Added comprehensive test suite with 27 tests
 - All tests passing (205 total, up from 157)
 - Type checking and linting passing
-- Movement detection system now complete and ready for scoring integration
+- Movement detection system now complete and integrated into Game component
+- Movement detection integrated with scoring for real-time score calculation (240 total tests passing)
 
 **Technical Decisions:**
 
@@ -1420,7 +1479,7 @@ _Goal: Stability, accessibility, and performance_
 - Timer pauses when tab becomes hidden, resumes when visible, calculating elapsed time to sync state
 - Added generation tracking state that increments with each step and resets on clear/random
 - STEP button uses existing stepSimulation function which was already implemented but not used
-- All tests passing (228 total)
+- All tests passing (228 total, up to 240 with integration)
 
 **Next Steps:**
 

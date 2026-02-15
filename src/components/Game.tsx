@@ -1,10 +1,22 @@
-import { useState, useCallback } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import { createGrid, GRID_SIZE_PRESETS, type GridSizePreset } from '../lib/simulation'
-import { type GridType, type FluxState, type InteractionMode } from '../types'
+import { type GridType, type FluxState, type InteractionMode, type TrackedCluster } from '../types'
 import { createInitialFluxState } from '../lib/flux'
 import { GridInteraction } from './GridInteraction'
 import { usePhaseTimer } from '../hooks/usePhaseTimer'
 import { stepSimulation, CONWAY_RULES } from '../lib/simulation'
+import {
+  findConnectedComponents,
+  trackClusters,
+  createInitialMovementDetectionParams,
+} from '../lib/movement'
+import {
+  createInitialScoreState,
+  createInitialScoringConfig,
+  updateScore,
+  calculateGenerationScore,
+} from '../lib/scoring'
+import { ScoreDisplay } from './ScoreDisplay'
 
 export function Game() {
   const [gridPreset, setGridPreset] = useState<GridSizePreset>('SMALL')
@@ -13,12 +25,65 @@ export function Game() {
   const [showGridLines, setShowGridLines] = useState(true)
   const [interactionMode, setInteractionMode] = useState<InteractionMode>('DRAW')
   const [generation, setGeneration] = useState(0)
+  const [scoreState, setScoreState] = useState(() => createInitialScoreState())
+
+  const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
+  const simulationSpeed = 200
+
+  const movementConfig = createInitialMovementDetectionParams()
+  const scoringConfig = createInitialScoringConfig()
+
+  const [previousScore, setPreviousScore] = useState(0)
 
   const hasCells = useCallback(() => {
     return grid.flat().filter((cell: number) => cell > 0).length > 0
   }, [grid])
 
   const { phaseState, startCountdown } = usePhaseTimer(hasCells)
+
+  const handleSimulationStep = useCallback(() => {
+    const currentState = {
+      grid,
+      generation,
+      running: true,
+      speed: simulationSpeed,
+      selectedRule: CONWAY_RULES,
+    }
+
+    const result = stepSimulation(currentState)
+
+    const currentClusters = findConnectedComponents(result.newGrid, result.newGeneration)
+    const tracked = trackClusters(
+      currentClusters,
+      previousTrackedClustersRef.current,
+      movementConfig
+    )
+
+    const generationScore = calculateGenerationScore(tracked, scoringConfig)
+    const newScoreState = updateScore(scoreState, generationScore)
+
+    setPreviousScore(scoreState.currentScore)
+    previousTrackedClustersRef.current = tracked
+    setScoreState(newScoreState)
+    setGrid(result.newGrid)
+    setGeneration(result.newGeneration)
+  }, [grid, generation, simulationSpeed, scoreState, movementConfig, scoringConfig])
+
+  useEffect(() => {
+    let interval: number | undefined
+
+    if (phaseState.current === 'RUNNING') {
+      interval = window.setInterval(() => {
+        handleSimulationStep()
+      }, simulationSpeed)
+    }
+
+    return () => {
+      if (interval) {
+        window.clearInterval(interval)
+      }
+    }
+  }, [phaseState, simulationSpeed, handleSimulationStep])
 
   const handleStart = useCallback(() => {
     if (phaseState.current === 'PLANNING' && hasCells()) {
@@ -40,6 +105,8 @@ export function Game() {
     setGrid(createGrid(rows, cols))
     setFlux(createInitialFluxState(20))
     setGeneration(0)
+    setScoreState(createInitialScoreState())
+    previousTrackedClustersRef.current = []
   }, [gridPreset])
 
   const handleRandom = useCallback(() => {
@@ -58,6 +125,8 @@ export function Game() {
     setGrid(newGrid)
     setFlux(createInitialFluxState(20))
     setGeneration(0)
+    setScoreState(createInitialScoreState())
+    previousTrackedClustersRef.current = []
   }, [gridPreset])
 
   const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
@@ -80,6 +149,12 @@ export function Game() {
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#0a0a0f', minHeight: '100vh', color: '#fff' }}>
+      <ScoreDisplay
+        score={scoreState.currentScore}
+        previousScore={previousScore}
+        showPatternBreakdown={false}
+      />
+
       <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#61dafb' }}>
         Conway's Game of Life
       </h1>
