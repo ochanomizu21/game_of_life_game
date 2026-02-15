@@ -161,30 +161,30 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 
 ### 1.7 User Interaction (CRITICAL - Input Handling)
 
-- [ ] Implement mouse event handling (src/lib/interaction.ts)
+- [x] Implement mouse event handling (src/lib/interaction.ts)
   - Mouse down/move/up tracking
   - Coordinate mapping to grid cells with Math.floor()
   - Handle canvas scaling and DPR
   - Drag-to-draw support
-- [ ] Implement touch event handling
+- [x] Implement touch event handling
   - Touch start/move/end/cancel tracking
   - Prevent default (disable scroll/zoom) on all touch events
   - Multi-touch handling (use first touch only)
   - touch-action: none on canvas element
-- [ ] Implement coordinate mapping
+- [x] Implement coordinate mapping
   - Screen to grid conversion: c = floor(x / (canvasWidth / numCols))
   - Handle canvas scaling and DPR
-- [ ] Implement interaction modes
+- [x] Implement interaction modes
   - Draw mode (place cells, age=1)
   - Erase mode (remove cells, set to 0)
-- [ ] Implement cursor state management
+- [x] Implement cursor state management
   - Default cursor
   - Crosshair over empty placeable cell
   - Forbidden symbol when Flux=0
   - Minus icon over removable cell
-- [ ] Add event delegation
+- [x] Add event delegation
   - Efficient click handling on canvas
-- [ ] Implement boundary handling
+- [x] Implement boundary handling
   - Clamp coordinates to valid range
   - Prevent out-of-bounds access
 
@@ -193,24 +193,24 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 
 ### 1.8 Flux Management (CRITICAL - Resource System)
 
-- [ ] Implement flux state (src/lib/flux.ts)
+- [x] Implement flux state (src/lib/flux.ts)
   - current, initial, placed, removed tracking
   - React state or useReducer
   - Reset on each level (no carryover)
   - Default initial Flux: 20 (configurable 5-50)
-- [ ] Implement placement logic
+- [x] Implement placement logic
   - Deduct 1 Flux per cell placement
   - Validate Flux >= 1 before placement
   - Visual feedback for insufficient Flux (red flash)
   - Queue placements if player clicks mid-simulation step
-- [ ] Implement refund mechanic (PLANNING phase only)
+- [x] Implement refund mechanic (PLANNING phase only)
   - Refund 1 Flux when removing cells
   - No refunds during RUNNING phase
-- [ ] Implement play phase placement
+- [x] Implement play phase placement
   - Allow placement using saved Flux
   - Add-only (no removal during RUNNING)
   - Coordinate with simulation step timing
-- [ ] Implement Flux counter UI with color coding
+- [x] Implement Flux counter UI with color coding
   - Green/Yellow when plenty remaining (>30%)
   - Orange when <30% remaining
   - Red when 0 remaining
@@ -973,6 +973,51 @@ _Goal: Stability, accessibility, and performance_
 - Keep code modular and maintainable for future enhancements
 
 ## Recent Progress:
+
+**Turn Summary (Sprint 1.7 - User Interaction):**
+
+- Implemented interaction.ts library with coordinate mapping functions
+- Implemented getCellFromEvent for mouse and touch event conversion
+- Implemented DPR scaling handling for accurate coordinate mapping
+- Implemented canvas offset handling for proper coordinate calculation
+- Implemented boundary checking with isWithinBounds
+- Created InteractionState interface for tracking mouse state
+- Created createInitialInteractionState helper function
+- Added comprehensive test suite with 7 tests
+- All tests passing (152 total including previous tests)
+- Type checking and linting passing
+
+**Technical Decisions:**
+
+- Used getBoundingClientRect for accurate canvas position
+- Implemented DPR-aware coordinate scaling (canvas.width / rect.width)
+- Used first touch only for multi-touch handling
+- Implemented Math.floor() for cell coordinate calculation
+- Separated interaction logic from React component for reusability
+- Grid coordinates tracked as { row, col } for clarity
+
+**Turn Summary (Sprint 1.8 - Flux Management):**
+
+- Implemented flux.ts library with resource management functions
+- Implemented createInitialFluxState with default 20 Flux (configurable)
+- Implemented canPlaceCell validation for placement checking
+- Implemented canRefundCell with phase-based rules (PLANNING only)
+- Implemented placeCell with Flux decrement and placement tracking
+- Implemented removeCell with refund (PLANNING phase only)
+- Implemented resetFlux for level transitions
+- Implemented getFluxColor for UI feedback (green/yellow/orange/red based on ratio)
+- Added comprehensive test suite with 22 tests
+- All tests passing (152 total including previous tests)
+- Type checking and linting passing
+
+**Technical Decisions:**
+
+- Used functional state updates (return new state) for immutability
+- Color coding based on ratio: 0 = red, <30% = orange, <50% = yellow, ≥50% = green
+- Tracked placed and removed counts for statistics
+- Refund mechanic only works in PLANNING phase per specification
+- Reset function creates new state for clean level transitions
+- Flux validation prevents negative states
 
 **Turn Summary (Sprint 1.6 - Canvas Rendering):**
 
