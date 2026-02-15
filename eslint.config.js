@@ -31,6 +31,9 @@ export default [
         afterEach: 'readonly',
         vi: 'readonly',
         HTMLCanvasElement: 'readonly',
+        Touch: 'readonly',
+        MouseEvent: 'readonly',
+        TouchEvent: 'readonly',
       },
     },
     plugins: {
