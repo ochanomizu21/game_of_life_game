@@ -13,9 +13,23 @@ interface CanvasGridProps {
   grid: GridType
   showGridLines: boolean
   cellSize?: number
+  onClick?: (
+    event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => void
+  onMouseMove?: (
+    event: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>
+  ) => void
+  onMouseLeave?: () => void
 }
 
-export function CanvasGrid({ grid, showGridLines, cellSize }: CanvasGridProps) {
+export function CanvasGrid({
+  grid,
+  showGridLines,
+  cellSize,
+  onClick,
+  onMouseMove,
+  onMouseLeave,
+}: CanvasGridProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
 
   const actualCellSize = cellSize ?? getResponsiveCellSize()
@@ -100,5 +114,13 @@ export function CanvasGrid({ grid, showGridLines, cellSize }: CanvasGridProps) {
     draw()
   }, [draw])
 
-  return <canvas ref={canvasRef} style={{ touchAction: 'none' }} />
+  return (
+    <canvas
+      ref={canvasRef}
+      style={{ touchAction: 'none' }}
+      onClick={onClick}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+    />
+  )
 }

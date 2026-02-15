@@ -34,6 +34,7 @@ export default [
         Touch: 'readonly',
         MouseEvent: 'readonly',
         TouchEvent: 'readonly',
+        React: 'readonly',
       },
     },
     plugins: {
