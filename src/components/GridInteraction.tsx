@@ -14,6 +14,8 @@ interface GridInteractionProps {
   onGridChange: (newGrid: GridType) => void
   onFluxChange: (newFlux: FluxState) => void
   interactionMode: 'DRAW' | 'ERASE'
+  onInteractionSound?: (type: 'draw' | 'erase') => void
+  onFluxErrorSound?: () => void
 }
 
 export function GridInteraction({
@@ -25,6 +27,8 @@ export function GridInteraction({
   onGridChange,
   onFluxChange,
   interactionMode,
+  onInteractionSound,
+  onFluxErrorSound,
 }: GridInteractionProps) {
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
 
@@ -40,6 +44,7 @@ export function GridInteraction({
       if (interactionMode === 'DRAW') {
         if (cellExists) {
           if (phase === 'PLANNING') {
+            onInteractionSound?.('erase')
             const newFlux = removeCell(flux, phase)
             const newGrid = grid.map((r, rIdx) =>
               r.map((cell, cIdx) => (rIdx === row && cIdx === col ? 0 : cell))
@@ -49,16 +54,20 @@ export function GridInteraction({
           }
         } else {
           if (canPlaceCell(flux)) {
+            onInteractionSound?.('draw')
             const newFlux = placeCell(flux)
             const newGrid = grid.map((r, rIdx) =>
               r.map((cell, cIdx) => (rIdx === row && cIdx === col ? 1 : cell))
             )
             onFluxChange(newFlux)
             onGridChange(newGrid)
+          } else {
+            onFluxErrorSound?.()
           }
         }
       } else if (interactionMode === 'ERASE') {
         if (cellExists && phase === 'PLANNING') {
+          onInteractionSound?.('erase')
           const newFlux = removeCell(flux, phase)
           const newGrid = grid.map((r, rIdx) =>
             r.map((cell, cIdx) => (rIdx === row && cIdx === col ? 0 : cell))
@@ -68,7 +77,16 @@ export function GridInteraction({
         }
       }
     },
-    [grid, flux, phase, interactionMode, onGridChange, onFluxChange]
+    [
+      grid,
+      flux,
+      phase,
+      interactionMode,
+      onGridChange,
+      onFluxChange,
+      onInteractionSound,
+      onFluxErrorSound,
+    ]
   )
 
   const handleCanvasClick = useCallback(

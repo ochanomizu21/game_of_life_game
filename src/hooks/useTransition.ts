@@ -22,7 +22,8 @@ interface TransitionTimer {
 
 export function useTransition(
   config: TransitionConfig = DEFAULT_CONFIG,
-  onTransitionComplete?: () => void
+  onTransitionComplete?: () => void,
+  onTransitionSound?: (state: 'fade-out' | 'fade-in') => void
 ) {
   const [transitionState, setTransitionState] = useState<TransitionStateInternal>({
     current: 'PLAYING',
@@ -43,6 +44,7 @@ export function useTransition(
   const startTransition = () => {
     clearTimeoutRef()
     setTransitionState({ current: 'FADING_OUT', canTransition: false })
+    onTransitionSound?.('fade-out')
 
     const runTransitionSequence = () => {
       if (isTabHidden.current) {
@@ -59,6 +61,7 @@ export function useTransition(
 
         timeoutRef.current = window.setTimeout(() => {
           setTransitionState({ current: 'FADING_IN', canTransition: false })
+          onTransitionSound?.('fade-in')
 
           timeoutRef.current = window.setTimeout(() => {
             setTransitionState({ current: 'READY', canTransition: true })
@@ -104,6 +107,7 @@ export function useTransition(
 
             timeoutRef.current = window.setTimeout(() => {
               setTransitionState({ current: 'FADING_IN', canTransition: false })
+              onTransitionSound?.('fade-in')
 
               timeoutRef.current = window.setTimeout(() => {
                 setTransitionState({ current: 'READY', canTransition: true })
@@ -112,6 +116,7 @@ export function useTransition(
             }, config.interstitialDuration)
           } else if (transitionState.current === 'INTERSTITIAL') {
             setTransitionState({ current: 'FADING_IN', canTransition: false })
+            onTransitionSound?.('fade-in')
 
             timeoutRef.current = window.setTimeout(() => {
               setTransitionState({ current: 'READY', canTransition: true })

@@ -56,6 +56,7 @@ export function Game() {
   const [showVictory, setShowVictory] = useState(false)
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
+  const previousPhaseRef = useRef<'PLANNING' | 'COUNTDOWN' | 'RUNNING' | 'FINISHED'>('PLANNING')
   const simulationSpeed = 200
   const soundEngineRef = useRef<SoundEngine | null>(null)
 
@@ -64,6 +65,18 @@ export function Game() {
     volume: audioVolume,
     waveform: audioWaveform,
   } = expertSettings.audio
+
+  const handleInteractionSound = useCallback((type: 'draw' | 'erase') => {
+    soundEngineRef.current?.playInteractionSound(type)
+  }, [])
+
+  const handleTransitionSound = useCallback((type: 'fade-out' | 'fade-in') => {
+    soundEngineRef.current?.playTransitionSound(type)
+  }, [])
+
+  const handleFluxErrorSound = useCallback(() => {
+    soundEngineRef.current?.playFluxErrorSound()
+  }, [])
 
   useEffect(() => {
     if (!soundEngineRef.current) {
@@ -106,7 +119,8 @@ export function Game() {
       autoAdvanceDelay: 2000,
       skipEnabled: true,
     },
-    handleTransitionComplete
+    handleTransitionComplete,
+    handleTransitionSound
   )
 
   const [previousScore, setPreviousScore] = useState(0)
@@ -116,6 +130,13 @@ export function Game() {
   }, [grid])
 
   const { phaseState, startCountdown, startRunning } = usePhaseTimer(hasCells)
+
+  useEffect(() => {
+    if (previousPhaseRef.current === 'COUNTDOWN' && phaseState.current === 'RUNNING') {
+      soundEngineRef.current?.playSimulationStartSound()
+    }
+    previousPhaseRef.current = phaseState.current
+  }, [phaseState.current])
 
   useEffect(() => {
     if (phaseState.current === 'FINISHED') {
@@ -146,6 +167,11 @@ export function Game() {
     }
 
     const result = stepSimulation(currentState)
+
+    if (result.bornCount > 0) {
+      const totalRows = grid.length
+      soundEngineRef.current?.playGenerationSound(result.bornCount, result.averageRow, totalRows)
+    }
 
     const currentClusters = findConnectedComponents(result.newGrid, result.newGeneration)
     const tracked = trackClusters(
@@ -330,6 +356,8 @@ export function Game() {
           onGridChange={handleGridChange}
           onFluxChange={handleFluxChange}
           interactionMode={interactionMode}
+          onInteractionSound={handleInteractionSound}
+          onFluxErrorSound={handleFluxErrorSound}
         />
       </div>
     </div>

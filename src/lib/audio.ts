@@ -217,10 +217,42 @@ export class SoundEngine {
     }
   }
 
+  playFluxErrorSound(): void {
+    if (!this.enabled) return
+
+    this.ensureAudioContext()
+
+    if (!this.audioContext) return
+
+    try {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.frequency.value = 150
+      oscillator.type = 'sawtooth'
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume * 0.5, this.audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.08)
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.08)
+    } catch (error) {
+      console.error('Error playing flux error sound:', error)
+    }
+  }
+
   private ensureAudioContext(): void {
     if (!this.audioContext) {
       try {
-        this.audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+        const AudioContextClass =
+          window.AudioContext ||
+          (window as typeof window & { webkitAudioContext?: typeof AudioContext })
+            .webkitAudioContext
+        this.audioContext = new AudioContextClass()
       } catch (error) {
         console.error('Error creating AudioContext:', error)
       }

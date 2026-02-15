@@ -4,6 +4,7 @@ import type { AudioParams } from '../types'
 
 describe('audio', () => {
   let mockAudioContext: any
+  let AudioContextMock: any
 
   beforeEach(() => {
     mockAudioContext = {
@@ -27,10 +28,9 @@ describe('audio', () => {
       currentTime: 0,
     }
 
-    vi.stubGlobal(
-      'AudioContext',
-      vi.fn(() => mockAudioContext)
-    )
+    AudioContextMock = vi.fn(() => mockAudioContext)
+    ;(window as any).AudioContext = AudioContextMock
+    ;(window as any).webkitAudioContext = AudioContextMock
   })
 
   describe('SoundEngine', () => {
@@ -79,6 +79,19 @@ describe('audio', () => {
       engine.setEnabled(false)
       engine.playInteractionSound('draw')
       expect(mockAudioContext.createOscillator).not.toHaveBeenCalled()
+    })
+
+    it('should not play flux error sound when disabled', () => {
+      const engine = new SoundEngine()
+      engine.setEnabled(false)
+      engine.playFluxErrorSound()
+      expect(mockAudioContext.createOscillator).not.toHaveBeenCalled()
+    })
+
+    it('should not throw error when playing flux error sound', () => {
+      const engine = new SoundEngine()
+      engine.setEnabled(true)
+      expect(() => engine.playFluxErrorSound()).not.toThrow()
     })
   })
 
