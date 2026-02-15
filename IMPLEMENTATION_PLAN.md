@@ -838,11 +838,11 @@ _Goal: Audio sonification, visual polish, and enhancements_
 - Polyphonic support: concurrent sounds allowed
 - Error handling: graceful degradation on errors
 
-**Test Coverage: 18 tests**
+**Test Coverage: 19 tests**
 
 - SoundEngine creation: 1 test
-- State management: 3 tests (setEnabled, setVolume, setWaveform)
-- Audio generation: 4 tests (disabled check, bornCount check, interaction sounds)
+- State management: 3 tests (enabled, volume, waveform)
+- Audio generation: 5 tests (disabled check, bornCount check, interaction sounds, flux error sound)
 - AudioParams validation: 10 tests (all parameters and ranges)
 
 **Integration Notes:**
@@ -850,8 +850,10 @@ _Goal: Audio sonification, visual polish, and enhancements_
 - Audio engine integrated into Game component
 - SettingsPanel provides UI for audio configuration
 - Audio parameters persisted to localStorage
-- Audio sounds ready to be connected to simulation and interaction events
-- Hook points available for simulation start, level complete, transition sounds
+- All audio sounds connected to simulation and interaction events
+- Flux error sound provides feedback when player tries to place cells with insufficient Flux
+
+**Completed**: Sprint 4.1 Audio Sonification (2026-02-16) - All sounds implemented and integrated
 
 ### 4.2 Visual Polish (MEDIUM - Enhancement)
 
