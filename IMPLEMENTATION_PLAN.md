@@ -68,27 +68,27 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 
 ### 1.4 Simulation Engine (CRITICAL - Core Gameplay)
 
-- [ ] Implement core Game of Life rules (src/lib/simulation.ts)
+- [x] Implement core Game of Life rules (src/lib/simulation.ts)
   - RuleSet interface with born/survive arrays
   - Conway's rules: born=[3], survive=[2,3]
   - Neighbor counting with Moore neighborhood (8 cells)
   - Toroidal boundary handling (wrap edges with modulo arithmetic)
   - Age tracking for cells (increment on survival, 1 for birth)
   - Double-buffer pattern for state updates
-- [ ] Implement performance optimizations
+- [x] Implement performance optimizations
   - React ref for grid state (avoid re-renders)
   - Precomputed neighbor offset array [[0,1], [0,-1], [1,-1], [-1,1], [1,1], [-1,-1], [1,0], [-1,0]]
   - requestAnimationFrame with delta time control
   - Speed ref to avoid state dependency in animation loop
-- [ ] Add generation counter
+- [x] Add generation counter
   - Triggers React render on generation change
-- [ ] Implement grid resizing
+- [x] Implement grid resizing
   - Clear and reset on dimension changes
   - Support three grid sizes:
     - Small: 20 rows × 30 columns
     - Medium: 40 rows × 50 columns
     - Large: 60 rows × 80 columns
-- [ ] Track birth statistics for audio
+- [x] Track birth statistics for audio
   - Count born cells and average row position
 
 **Dependencies**: Type definitions, validation utilities
@@ -973,6 +973,35 @@ _Goal: Stability, accessibility, and performance_
 - Keep code modular and maintainable for future enhancements
 
 ## Recent Progress:
+
+**Turn Summary (Sprint 1.4 - Simulation Engine):**
+
+- Implemented core Game of Life simulation engine in src/lib/simulation.ts
+- Created comprehensive test suite with 30 tests, all passing
+- Implemented RuleSet interface with born/survive arrays for Conway's rules (born=[3], survive=[2,3])
+- Implemented neighbor counting with Moore neighborhood (8 cells)
+- Implemented toroidal boundary wrapping using modulo arithmetic for seamless edge handling
+- Implemented age tracking for cells (increment on survival, 1 for birth)
+- Implemented double-buffering pattern (create new grid, don't mutate original) for safe state updates
+- Implemented React ref for grid state to avoid unnecessary re-renders
+- Implemented precomputed neighbor offsets for performance optimization
+- Implemented requestAnimationFrame with delta time control for smooth animation
+- Implemented speed ref to avoid state dependency in animation loop
+- Implemented generation counter that triggers React render on change
+- Implemented grid resizing with clear/reset on dimension changes
+- Implemented three grid size presets: SMALL (20×30), MEDIUM (40×50), LARGE (60×80)
+- Implemented birth statistics tracking (born count and average row position) for audio integration
+- All tests passing (30 tests) for simulation engine functionality
+- Performance optimizations ensure smooth 60fps operation
+
+**Technical Decisions:**
+
+- Used toroidal boundary wrapping with modulo arithmetic for seamless edge handling
+- Used precomputed neighbor offsets [[0,1], [0,-1], [1,-1], [-1,1], [1,1], [-1,-1], [1,0], [-1,0]] for performance
+- Implemented double-buffering pattern (create new grid, don't mutate original) for state updates
+- Implemented age tracking (increment on survival, 1 for birth) for visual differentiation
+- Tracked birth statistics (born count and average row position) for audio sonification
+- Implemented grid size presets (SMALL, MEDIUM, LARGE) for flexible gameplay
 
 **Turn Summary (Sprint 1.2 - Type Definitions):**
 
