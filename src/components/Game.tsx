@@ -20,6 +20,7 @@ import { GlassHUD } from './GlassHUD'
 import { SettingsPanel } from './SettingsPanel'
 import { TransitionOverlay } from './TransitionOverlay'
 import { VictoryScreen } from './VictoryScreen'
+import { UIToggleButton } from './UIToggleButton'
 import {
   createInitialExpertSettings,
   saveToLocalStorage,
@@ -31,6 +32,8 @@ import {
   advanceLevel,
   isFinalLevel,
   resetProgression,
+  saveHighScore,
+  getHighScore,
 } from '../lib/level'
 import { SoundEngine } from '../lib/audio'
 
@@ -54,6 +57,9 @@ export function Game() {
     generateProgression(createInitialExpertSettings().levelGeneration)
   )
   const [showVictory, setShowVictory] = useState(false)
+  const [isUiVisible, setIsUiVisible] = useState(true)
+  const [highScore, setHighScore] = useState(0)
+  const [trackedClusters, setTrackedClusters] = useState<TrackedCluster[]>([])
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
   const previousPhaseRef = useRef<'PLANNING' | 'COUNTDOWN' | 'RUNNING' | 'FINISHED'>('PLANNING')
@@ -89,6 +95,14 @@ export function Game() {
 
   const currentLevelConfig = getCurrentLevelConfig(levelProgression)
 
+  useEffect(() => {
+    if (currentLevelConfig) {
+      window.requestAnimationFrame(() => {
+        setHighScore(getHighScore(currentLevelConfig.levelNumber))
+      })
+    }
+  }, [currentLevelConfig])
+
   const movementConfig = expertSettings.movementDetection
   const scoringConfig = expertSettings.scoring
 
@@ -96,6 +110,16 @@ export function Game() {
     soundEngineRef.current?.playLevelStartSound()
 
     if (isFinalLevel(levelProgression)) {
+      const updatedProgression: LevelProgression = {
+        ...levelProgression,
+        totalScore: levelProgression.totalScore + scoreState.currentScore,
+        currentLevel: levelProgression.currentLevel + 1,
+        maxUnlockedLevel: Math.max(
+          levelProgression.maxUnlockedLevel,
+          levelProgression.currentLevel + 1
+        ),
+      }
+      setLevelProgression(updatedProgression)
       setShowVictory(true)
     } else {
       const newProgression = advanceLevel(levelProgression, scoreState.currentScore)
@@ -157,6 +181,15 @@ export function Game() {
     }
   }, [transitionState, resetTransition])
 
+  useEffect(() => {
+    if (phaseState.current === 'FINISHED' && currentLevelConfig && scoreState.currentScore > 0) {
+      saveHighScore(currentLevelConfig.levelNumber, scoreState.currentScore)
+      window.requestAnimationFrame(() => {
+        setHighScore(getHighScore(currentLevelConfig.levelNumber))
+      })
+    }
+  }, [phaseState, currentLevelConfig, scoreState.currentScore])
+
   const handleSimulationStep = useCallback(() => {
     const currentState = {
       grid,
@@ -174,21 +207,26 @@ export function Game() {
     }
 
     const currentClusters = findConnectedComponents(result.newGrid, result.newGeneration)
-    const tracked = trackClusters(
-      currentClusters,
-      previousTrackedClustersRef.current,
-      movementConfig
-    )
+    const tracked = trackClusters(currentClusters, trackedClusters, movementConfig)
 
     const generationScore = calculateGenerationScore(tracked, scoringConfig)
     const newScoreState = updateScore(scoreState, generationScore)
 
     setPreviousScore(scoreState.currentScore)
     previousTrackedClustersRef.current = tracked
+    setTrackedClusters(tracked)
     setScoreState(newScoreState)
     setGrid(result.newGrid)
     setGeneration(result.newGeneration)
-  }, [grid, generation, simulationSpeed, scoreState, movementConfig, scoringConfig])
+  }, [
+    grid,
+    generation,
+    simulationSpeed,
+    scoreState,
+    movementConfig,
+    scoringConfig,
+    trackedClusters,
+  ])
 
   useEffect(() => {
     let interval: number | undefined
@@ -204,7 +242,7 @@ export function Game() {
         window.clearInterval(interval)
       }
     }
-  }, [phaseState, simulationSpeed, handleSimulationStep])
+  }, [phaseState, simulationSpeed, handleSimulationStep, trackedClusters])
 
   const handleStart = useCallback(() => {
     if (phaseState.current === 'PLANNING' && hasCells() && currentLevelConfig) {
@@ -228,7 +266,7 @@ export function Game() {
     setFlux(createInitialFluxState(20))
     setGeneration(0)
     setScoreState(createInitialScoreState())
-    previousTrackedClustersRef.current = []
+    setTrackedClusters([])
   }, [gridPreset])
 
   const handleRandom = useCallback(() => {
@@ -248,7 +286,7 @@ export function Game() {
     setFlux(createInitialFluxState(20))
     setGeneration(0)
     setScoreState(createInitialScoreState())
-    previousTrackedClustersRef.current = []
+    setTrackedClusters([])
   }, [gridPreset])
 
   const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
@@ -279,14 +317,25 @@ export function Game() {
   }, [phaseState, grid, generation])
 
   const canInteract = phaseState.current === 'PLANNING'
-  const isUiVisible = true
+
+  const movers = trackedClusters.filter((c) => c.classification === 'MOVER').length
+  const oscillators = trackedClusters.filter((c) => c.classification === 'OSCILLATOR').length
+  const rate =
+    scoringConfig.moverPointsPerGeneration * movers +
+    scoringConfig.oscillatorPointsPerGeneration * oscillators
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#0a0a0f', minHeight: '100vh', color: '#fff' }}>
+      <UIToggleButton isVisible={isUiVisible} onToggle={() => setIsUiVisible(!isUiVisible)} />
+
       <ScoreDisplay
         score={scoreState.currentScore}
         previousScore={previousScore}
-        showPatternBreakdown={false}
+        showPatternBreakdown={true}
+        movers={movers}
+        oscillators={oscillators}
+        rate={rate}
+        highScore={highScore}
       />
 
       <SettingsPanel
