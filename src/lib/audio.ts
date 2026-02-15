@@ -98,6 +98,125 @@ export class SoundEngine {
     }
   }
 
+  playLevelCompleteSound(): void {
+    if (!this.enabled) return
+
+    this.ensureAudioContext()
+
+    if (!this.audioContext) return
+
+    try {
+      const oscillator1 = this.audioContext.createOscillator()
+      const oscillator2 = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator1.frequency.value = 523.25
+      oscillator2.frequency.value = 659.25
+      oscillator1.type = this.waveform
+      oscillator2.type = this.waveform
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume, this.audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.3)
+
+      oscillator1.connect(gainNode)
+      oscillator2.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator1.start(this.audioContext.currentTime)
+      oscillator2.start(this.audioContext.currentTime)
+      oscillator1.stop(this.audioContext.currentTime + 0.3)
+      oscillator2.stop(this.audioContext.currentTime + 0.3)
+    } catch (error) {
+      console.error('Error playing level complete sound:', error)
+    }
+  }
+
+  playLevelStartSound(): void {
+    if (!this.enabled) return
+
+    this.ensureAudioContext()
+
+    if (!this.audioContext) return
+
+    try {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.frequency.value = 440
+      oscillator.type = this.waveform
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume, this.audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.2)
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.2)
+    } catch (error) {
+      console.error('Error playing level start sound:', error)
+    }
+  }
+
+  playTransitionSound(type: 'fade-out' | 'fade-in'): void {
+    if (!this.enabled) return
+
+    this.ensureAudioContext()
+
+    if (!this.audioContext) return
+
+    try {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      const frequency = type === 'fade-out' ? 300 : 400
+      oscillator.frequency.value = frequency
+      oscillator.type = this.waveform
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume * 0.5, this.audioContext.currentTime + 0.01)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.15)
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.15)
+    } catch (error) {
+      console.error('Error playing transition sound:', error)
+    }
+  }
+
+  playSimulationStartSound(): void {
+    if (!this.enabled) return
+
+    this.ensureAudioContext()
+
+    if (!this.audioContext) return
+
+    try {
+      const oscillator = this.audioContext.createOscillator()
+      const gainNode = this.audioContext.createGain()
+
+      oscillator.frequency.value = 330
+      oscillator.type = this.waveform
+
+      gainNode.gain.setValueAtTime(0, this.audioContext.currentTime)
+      gainNode.gain.linearRampToValueAtTime(this.volume, this.audioContext.currentTime + 0.005)
+      gainNode.gain.exponentialRampToValueAtTime(0.001, this.audioContext.currentTime + 0.1)
+
+      oscillator.connect(gainNode)
+      gainNode.connect(this.audioContext.destination)
+
+      oscillator.start(this.audioContext.currentTime)
+      oscillator.stop(this.audioContext.currentTime + 0.1)
+    } catch (error) {
+      console.error('Error playing simulation start sound:', error)
+    }
+  }
+
   private ensureAudioContext(): void {
     if (!this.audioContext) {
       try {

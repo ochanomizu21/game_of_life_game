@@ -32,6 +32,7 @@ import {
   isFinalLevel,
   resetProgression,
 } from '../lib/level'
+import { SoundEngine } from '../lib/audio'
 
 export function Game() {
   const [gridPreset, setGridPreset] = useState<GridSizePreset>('SMALL')
@@ -56,6 +57,22 @@ export function Game() {
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
   const simulationSpeed = 200
+  const soundEngineRef = useRef<SoundEngine | null>(null)
+
+  const {
+    enabled: audioEnabled,
+    volume: audioVolume,
+    waveform: audioWaveform,
+  } = expertSettings.audio
+
+  useEffect(() => {
+    if (!soundEngineRef.current) {
+      soundEngineRef.current = new SoundEngine()
+    }
+    soundEngineRef.current.setEnabled(audioEnabled)
+    soundEngineRef.current.setVolume(audioVolume)
+    soundEngineRef.current.setWaveform(audioWaveform)
+  }, [audioEnabled, audioVolume, audioWaveform])
 
   const currentLevelConfig = getCurrentLevelConfig(levelProgression)
 
@@ -63,6 +80,8 @@ export function Game() {
   const scoringConfig = expertSettings.scoring
 
   const handleTransitionComplete = useCallback(() => {
+    soundEngineRef.current?.playLevelStartSound()
+
     if (isFinalLevel(levelProgression)) {
       setShowVictory(true)
     } else {
@@ -79,7 +98,7 @@ export function Game() {
     }
   }, [levelProgression, scoreState.currentScore, gridPreset])
 
-  const { transitionState, startTransition } = useTransition(
+  const { transitionState, startTransition, resetTransition } = useTransition(
     {
       fadeOutDuration: 2000,
       fadeInDuration: 2000,
@@ -103,10 +122,19 @@ export function Game() {
       window.setTimeout(() => {
         if (!showVictory) {
           startTransition()
+          soundEngineRef.current?.playLevelCompleteSound()
         }
       }, 2000)
     }
-  }, [phaseState.current, showVictory, startTransition])
+  }, [phaseState, showVictory, startTransition])
+
+  useEffect(() => {
+    if (transitionState === 'READY') {
+      window.setTimeout(() => {
+        resetTransition()
+      }, 100)
+    }
+  }, [transitionState, resetTransition])
 
   const handleSimulationStep = useCallback(() => {
     const currentState = {

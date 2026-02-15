@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import type { TransitionState, TransitionConfig } from '../types'
 
 const DEFAULT_CONFIG: TransitionConfig = {
@@ -14,6 +14,12 @@ interface TransitionStateInternal {
   canTransition: boolean
 }
 
+interface TransitionTimer {
+  timeoutId: number | null
+  startTime: number | null
+  remainingTime: number
+}
+
 export function useTransition(
   config: TransitionConfig = DEFAULT_CONFIG,
   onTransitionComplete?: () => void
@@ -24,6 +30,8 @@ export function useTransition(
   })
 
   const timeoutRef = useRef<number | null>(null)
+  const transitionTimers = useRef<Map<TransitionState, TransitionTimer>>(new Map())
+  const isTabHidden = useRef(false)
 
   const clearTimeoutRef = () => {
     if (timeoutRef.current !== null) {
@@ -33,30 +41,46 @@ export function useTransition(
   }
 
   const startTransition = () => {
+    clearTimeoutRef()
     setTransitionState({ current: 'FADING_OUT', canTransition: false })
 
-    timeoutRef.current = window.setTimeout(() => {
-      setTransitionState({ current: 'INTERSTITIAL', canTransition: false })
+    const runTransitionSequence = () => {
+      if (isTabHidden.current) {
+        transitionTimers.current.set('FADING_OUT', {
+          timeoutId: null,
+          startTime: null,
+          remainingTime: config.fadeOutDuration,
+        })
+        return
+      }
 
       timeoutRef.current = window.setTimeout(() => {
-        setTransitionState({ current: 'FADING_IN', canTransition: false })
+        setTransitionState({ current: 'INTERSTITIAL', canTransition: false })
 
         timeoutRef.current = window.setTimeout(() => {
-          setTransitionState({ current: 'READY', canTransition: true })
-          onTransitionComplete?.()
-        }, config.fadeInDuration)
-      }, config.interstitialDuration)
-    }, config.fadeOutDuration)
+          setTransitionState({ current: 'FADING_IN', canTransition: false })
+
+          timeoutRef.current = window.setTimeout(() => {
+            setTransitionState({ current: 'READY', canTransition: true })
+            onTransitionComplete?.()
+          }, config.fadeInDuration)
+        }, config.interstitialDuration)
+      }, config.fadeOutDuration)
+    }
+
+    runTransitionSequence()
   }
 
   const skipTransition = () => {
     clearTimeoutRef()
+    transitionTimers.current.clear()
     setTransitionState({ current: 'READY', canTransition: true })
     onTransitionComplete?.()
   }
 
   const resetTransition = () => {
     clearTimeoutRef()
+    transitionTimers.current.clear()
     setTransitionState({ current: 'PLAYING', canTransition: false })
   }
 
@@ -68,13 +92,84 @@ export function useTransition(
     }
   }
 
+  const resumeTransition = useCallback(() => {
+    const timer = transitionTimers.current.get(transitionState.current)
+    if (timer && timer.remainingTime > 0) {
+      clearTimeoutRef()
+
+      const runResumeSequence = () => {
+        timeoutRef.current = window.setTimeout(() => {
+          if (transitionState.current === 'FADING_OUT') {
+            setTransitionState({ current: 'INTERSTITIAL', canTransition: false })
+
+            timeoutRef.current = window.setTimeout(() => {
+              setTransitionState({ current: 'FADING_IN', canTransition: false })
+
+              timeoutRef.current = window.setTimeout(() => {
+                setTransitionState({ current: 'READY', canTransition: true })
+                onTransitionComplete?.()
+              }, config.fadeInDuration)
+            }, config.interstitialDuration)
+          } else if (transitionState.current === 'INTERSTITIAL') {
+            setTransitionState({ current: 'FADING_IN', canTransition: false })
+
+            timeoutRef.current = window.setTimeout(() => {
+              setTransitionState({ current: 'READY', canTransition: true })
+              onTransitionComplete?.()
+            }, config.fadeInDuration)
+          } else if (transitionState.current === 'FADING_IN') {
+            setTransitionState({ current: 'READY', canTransition: true })
+            onTransitionComplete?.()
+          }
+        }, timer.remainingTime)
+      }
+
+      runResumeSequence()
+      transitionTimers.current.delete(transitionState.current)
+    }
+  }, [transitionState, config, onTransitionComplete])
+
+  const handleVisibilityChange = useCallback(() => {
+    if (document.hidden) {
+      isTabHidden.current = true
+      clearTimeoutRef()
+
+      const timer: TransitionTimer = {
+        timeoutId: null,
+        startTime: Date.now(),
+        remainingTime: 0,
+      }
+
+      switch (transitionState.current) {
+        case 'FADING_OUT':
+          timer.remainingTime = config.fadeOutDuration
+          break
+        case 'INTERSTITIAL':
+          timer.remainingTime = config.interstitialDuration
+          break
+        case 'FADING_IN':
+          timer.remainingTime = config.fadeInDuration
+          break
+        default:
+          return
+      }
+
+      transitionTimers.current.set(transitionState.current, timer)
+    } else {
+      isTabHidden.current = false
+      resumeTransition()
+    }
+  }, [transitionState, config, resumeTransition])
+
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown)
+    window.addEventListener('visibilitychange', handleVisibilityChange)
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('visibilitychange', handleVisibilityChange)
       clearTimeoutRef()
     }
-  }, [config.skipEnabled, transitionState.current, skipTransition])
+  }, [config.skipEnabled, transitionState.current, skipTransition, handleVisibilityChange])
 
   return {
     transitionState: transitionState.current,
