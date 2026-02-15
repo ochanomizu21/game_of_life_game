@@ -12,9 +12,13 @@ describe('GlassHUD', () => {
     interactionMode: 'DRAW' as const,
     gridPreset: 'SMALL' as const,
     showGridLines: true,
+    generation: 0,
+    countdownValue: undefined as number | undefined,
+    timerRemaining: undefined as number | undefined,
     canStart: true,
     canInteract: true,
     onStart: vi.fn(),
+    onStep: vi.fn(),
     onClear: vi.fn(),
     onRandom: vi.fn(),
     onToggleGrid: vi.fn(),
@@ -158,12 +162,12 @@ describe('GlassHUD', () => {
 
   it('should highlight active interaction mode', () => {
     const { container: container1 } = render(<GlassHUD {...defaultProps} interactionMode="DRAW" />)
-    expect(container1.querySelectorAll('.hud-button')[3]).toHaveClass('active')
-    expect(container1.querySelectorAll('.hud-button')[4]).not.toHaveClass('active')
+    expect(container1.querySelectorAll('.hud-button')[4]).toHaveClass('active')
+    expect(container1.querySelectorAll('.hud-button')[5]).not.toHaveClass('active')
 
     const { container: container2 } = render(<GlassHUD {...defaultProps} interactionMode="ERASE" />)
-    expect(container2.querySelectorAll('.hud-button')[4]).toHaveClass('active')
-    expect(container2.querySelectorAll('.hud-button')[3]).not.toHaveClass('active')
+    expect(container2.querySelectorAll('.hud-button')[5]).toHaveClass('active')
+    expect(container2.querySelectorAll('.hud-button')[4]).not.toHaveClass('active')
   })
 
   it('should highlight active grid preset', () => {

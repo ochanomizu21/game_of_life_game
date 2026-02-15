@@ -10,9 +10,13 @@ interface GlassHUDProps {
   interactionMode: InteractionMode
   gridPreset: GridSizePreset
   showGridLines: boolean
+  generation: number
+  countdownValue?: number
+  timerRemaining?: number
   canStart: boolean
   canInteract: boolean
   onStart: () => void
+  onStep: () => void
   onClear: () => void
   onRandom: () => void
   onToggleGrid: () => void
@@ -29,9 +33,13 @@ export function GlassHUD({
   interactionMode,
   gridPreset,
   showGridLines,
+  generation,
+  countdownValue,
+  timerRemaining,
   canStart,
   canInteract,
   onStart,
+  onStep,
   onClear,
   onRandom,
   onToggleGrid,
@@ -54,6 +62,13 @@ export function GlassHUD({
       <div className="glass-hud">
         <div className="hud-controls">
           <div className="hud-group">
+            <button
+              className="hud-button"
+              onClick={onStep}
+              disabled={phase !== 'PLANNING' || !canInteract}
+            >
+              STEP
+            </button>
             <button
               className="hud-button active"
               onClick={onStart}
@@ -127,6 +142,22 @@ export function GlassHUD({
             <div className="hud-status-item">
               <span className="hud-status-label">Phase:</span>
               <span className="hud-status-value">{phase}</span>
+            </div>
+            {phase === 'COUNTDOWN' && (
+              <div className="hud-status-item">
+                <span className="hud-status-label">Countdown:</span>
+                <span className="hud-status-value">{countdownValue}</span>
+              </div>
+            )}
+            {phase === 'RUNNING' && (
+              <div className="hud-status-item">
+                <span className="hud-status-label">Timer:</span>
+                <span className="hud-status-value">{timerRemaining}s</span>
+              </div>
+            )}
+            <div className="hud-status-item">
+              <span className="hud-status-label">GEN:</span>
+              <span className="hud-status-value">{generation}</span>
             </div>
             <div className="hud-status-item">
               <span className="hud-status-label">Cells:</span>

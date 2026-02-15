@@ -13,11 +13,11 @@ describe('App', () => {
     expect(screen.getByText('Small')).toBeInTheDocument()
     expect(screen.getByText('Medium')).toBeInTheDocument()
     expect(screen.getByText('Large')).toBeInTheDocument()
-    expect(screen.getByText('Start')).toBeInTheDocument()
-    expect(screen.getByText('Clear')).toBeInTheDocument()
-    expect(screen.getByText('Random')).toBeInTheDocument()
-    expect(screen.getByText('Draw')).toBeInTheDocument()
-    expect(screen.getByText('Erase')).toBeInTheDocument()
+    expect(screen.getByText('START')).toBeInTheDocument()
+    expect(screen.getByText('CLEAR')).toBeInTheDocument()
+    expect(screen.getByText('RANDOM')).toBeInTheDocument()
+    expect(screen.getByText('DRAW')).toBeInTheDocument()
+    expect(screen.getByText('ERASE')).toBeInTheDocument()
   })
 
   it('renders status display', () => {
