@@ -1,0 +1,128 @@
+.transition-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: #000000;
+  z-index: 1500;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: opacity 0.1s ease;
+}
+
+.transition-overlay.fade-out {
+  animation: fadeOut 2s ease-in-out forwards;
+}
+
+.transition-overlay.fade-in {
+  animation: fadeIn 2s ease-in-out forwards;
+}
+
+.transition-overlay.interstitial {
+  opacity: 1;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeIn {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+.interstitial-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  animation: fadeInScale 0.5s ease-out;
+}
+
+.level-complete-text {
+  font-size: 3rem;
+  font-weight: bold;
+  color: #61dafb;
+  text-shadow: 0 0 20px rgba(97, 218, 251, 0.5);
+  margin-bottom: 2rem;
+  animation: fadeOutText 1s ease-out 1s forwards;
+}
+
+.next-level-text {
+  font-size: 2.5rem;
+  font-weight: bold;
+  color: #00ffff;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  animation: fadeInText 1s ease-in 1s forwards;
+  opacity: 0;
+}
+
+.skip-hint {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+@keyframes fadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes fadeOutText {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+}
+
+@keyframes fadeInText {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .level-complete-text {
+    font-size: 2rem;
+  }
+
+  .next-level-text {
+    font-size: 1.5rem;
+  }
+
+  .skip-hint {
+    font-size: 0.8rem;
+  }
+}

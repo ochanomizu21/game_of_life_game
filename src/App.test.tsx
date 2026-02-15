@@ -5,7 +5,7 @@ import App from './App'
 describe('App', () => {
   it('renders title', () => {
     render(<App />)
-    expect(screen.getByText("Conway's Game of Life")).toBeInTheDocument()
+    expect(screen.getByText(/Conway's Game of Life/)).toBeInTheDocument()
   })
 
   it('renders game controls', () => {

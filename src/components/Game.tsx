@@ -6,21 +6,32 @@ import {
   type InteractionMode,
   type TrackedCluster,
   type ExpertSettings,
+  type LevelProgression,
 } from '../types'
 import { createInitialFluxState } from '../lib/flux'
 import { GridInteraction } from './GridInteraction'
 import { usePhaseTimer } from '../hooks/usePhaseTimer'
+import { useTransition } from '../hooks/useTransition'
 import { stepSimulation, CONWAY_RULES } from '../lib/simulation'
 import { findConnectedComponents, trackClusters } from '../lib/movement'
 import { createInitialScoreState, updateScore, calculateGenerationScore } from '../lib/scoring'
 import { ScoreDisplay } from './ScoreDisplay'
 import { GlassHUD } from './GlassHUD'
 import { SettingsPanel } from './SettingsPanel'
+import { TransitionOverlay } from './TransitionOverlay'
+import { VictoryScreen } from './VictoryScreen'
 import {
   createInitialExpertSettings,
   saveToLocalStorage,
   loadFromLocalStorage,
 } from '../lib/settings'
+import {
+  generateProgression,
+  getCurrentLevelConfig,
+  advanceLevel,
+  isFinalLevel,
+  resetProgression,
+} from '../lib/level'
 
 export function Game() {
   const [gridPreset, setGridPreset] = useState<GridSizePreset>('SMALL')
@@ -38,12 +49,46 @@ export function Game() {
     )
     return saved
   })
+  const [levelProgression, setLevelProgression] = useState<LevelProgression>(() =>
+    generateProgression(createInitialExpertSettings().levelGeneration)
+  )
+  const [showVictory, setShowVictory] = useState(false)
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
   const simulationSpeed = 200
 
+  const currentLevelConfig = getCurrentLevelConfig(levelProgression)
+
   const movementConfig = expertSettings.movementDetection
   const scoringConfig = expertSettings.scoring
+
+  const handleTransitionComplete = useCallback(() => {
+    if (isFinalLevel(levelProgression)) {
+      setShowVictory(true)
+    } else {
+      const newProgression = advanceLevel(levelProgression, scoreState.currentScore)
+      const newLevelConfig = getCurrentLevelConfig(newProgression)
+
+      setLevelProgression(newProgression)
+      const { rows, cols } = GRID_SIZE_PRESETS[gridPreset]
+      setGrid(createGrid(rows, cols))
+      setFlux(createInitialFluxState(newLevelConfig?.initialFlux ?? 20))
+      setGeneration(0)
+      setScoreState(createInitialScoreState())
+      previousTrackedClustersRef.current = []
+    }
+  }, [levelProgression, scoreState.currentScore, gridPreset])
+
+  const { transitionState, startTransition } = useTransition(
+    {
+      fadeOutDuration: 2000,
+      fadeInDuration: 2000,
+      interstitialDuration: 2000,
+      autoAdvanceDelay: 2000,
+      skipEnabled: true,
+    },
+    handleTransitionComplete
+  )
 
   const [previousScore, setPreviousScore] = useState(0)
 
@@ -51,7 +96,17 @@ export function Game() {
     return grid.flat().filter((cell: number) => cell > 0).length > 0
   }, [grid])
 
-  const { phaseState, startCountdown } = usePhaseTimer(hasCells)
+  const { phaseState, startCountdown, startRunning } = usePhaseTimer(hasCells)
+
+  useEffect(() => {
+    if (phaseState.current === 'FINISHED') {
+      window.setTimeout(() => {
+        if (!showVictory) {
+          startTransition()
+        }
+      }, 2000)
+    }
+  }, [phaseState.current, showVictory, startTransition])
 
   const handleSimulationStep = useCallback(() => {
     const currentState = {
@@ -98,10 +153,11 @@ export function Game() {
   }, [phaseState, simulationSpeed, handleSimulationStep])
 
   const handleStart = useCallback(() => {
-    if (phaseState.current === 'PLANNING' && hasCells()) {
+    if (phaseState.current === 'PLANNING' && hasCells() && currentLevelConfig) {
       startCountdown()
+      startRunning(currentLevelConfig.timeLimitSeconds)
     }
-  }, [phaseState, startCountdown, hasCells])
+  }, [phaseState, startCountdown, hasCells, currentLevelConfig, startRunning])
 
   const handleGridChange = useCallback((newGrid: GridType) => {
     setGrid(newGrid)
@@ -187,8 +243,30 @@ export function Game() {
       />
 
       <h1 style={{ textAlign: 'center', marginBottom: '20px', color: '#61dafb' }}>
-        Conway's Game of Life
+        Level {levelProgression.currentLevel} - Conway's Game of Life
       </h1>
+
+      <TransitionOverlay
+        transitionState={transitionState}
+        currentLevel={levelProgression.currentLevel}
+      />
+
+      {showVictory && (
+        <VictoryScreen
+          totalScore={levelProgression.totalScore}
+          onPlayAgain={() => {
+            const reset = resetProgression()
+            setLevelProgression(reset)
+            setShowVictory(false)
+            const { rows, cols } = GRID_SIZE_PRESETS[gridPreset]
+            setGrid(createGrid(rows, cols))
+            setFlux(createInitialFluxState(reset.levels[0]?.initialFlux ?? 20))
+            setGeneration(0)
+            setScoreState(createInitialScoreState())
+            previousTrackedClustersRef.current = []
+          }}
+        />
+      )}
 
       {isUiVisible && (
         <GlassHUD
