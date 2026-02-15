@@ -28,21 +28,21 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 
 ### 1.2 Type Definitions (CRITICAL)
 
-- [ ] Create core types (src/types/index.ts)
-  - GridType (number[][]) - Age-based cell storage
-  - GamePhase enum (PLANNING | COUNTDOWN | RUNNING | FINISHED)
-  - InteractionMode enum (DRAW | ERASE)
-  - CellCluster interface (cells, centroid, generation)
-  - TrackedCluster interface (extends CellCluster with history, velocity, classification)
-  - SimulationState interface (grid, generation, running, speed, selectedRule)
-  - RuleSet interface (born[], survive[])
-  - FluxState interface (current, initial, placed, removed)
-  - LevelConfig interface (levelNumber, timeLimitSeconds, initialFlux)
-  - ScoringConfig interface (moverPointsPerGeneration, oscillatorPointsPerGeneration, scoreMultiplier)
-  - TransitionState enum (PLAYING | FADING_OUT | INTERSTITIAL | FADING_IN | READY)
-  - TransitionConfig interface (fade durations, interstitial, auto-advance, skip enabled)
-  - SoundEngine interface
-  - Various configuration interfaces
+- [x] Create core types (src/types/index.ts)
+  - [x] GridType (number[][]) - Age-based cell storage
+  - [x] GamePhase enum (PLANNING | COUNTDOWN | RUNNING | FINISHED)
+  - [x] InteractionMode enum (DRAW | ERASE)
+  - [x] CellCluster interface (cells, centroid, generation)
+  - [x] TrackedCluster interface (extends CellCluster with history, velocity, classification)
+  - [x] SimulationState interface (grid, generation, running, speed, selectedRule)
+  - [x] RuleSet interface (born[], survive[])
+  - [x] FluxState interface (current, initial, placed, removed)
+  - [x] LevelConfig interface (levelNumber, timeLimitSeconds, initialFlux)
+  - [x] ScoringConfig interface (moverPointsPerGeneration, oscillatorPointsPerGeneration, scoreMultiplier)
+  - [x] TransitionState enum (PLAYING | FADING_OUT | INTERSTITIAL | FADING_IN | READY)
+  - [x] TransitionConfig interface (fade durations, interstitial, auto-advance, skip enabled)
+  - [x] SoundEngine interface - Replaced with AudioParams interface (enabled, volume, waveform)
+  - [x] Various configuration interfaces (DifficultyScalingMode, LevelGenerationParams, MovementDetectionParams, GridSizingParams, AudioParams, ExpertSettings)
 
 **Dependencies**: Project setup
 **Enables**: All type-safe development
@@ -974,7 +974,25 @@ _Goal: Stability, accessibility, and performance_
 
 ## Recent Progress:
 
-**Turn Summary (Sprint 1.1 - Project Setup & Build System):**
+**Turn Summary (Sprint 1.2 - Type Definitions):**
+
+- Created comprehensive type definitions in src/types/index.ts
+- Defined GridType (number[][]) for age-based cell storage
+- Implemented GamePhase enum (PLANNING | COUNTDOWN | RUNNING | FINISHED)
+- Implemented InteractionMode enum (DRAW | ERASE)
+- Created CellCluster interface with cells, centroid, generation fields
+- Created TrackedCluster interface extending CellCluster with history, velocity, classification
+- Created SimulationState interface for grid state management
+- Created RuleSet interface for born/survive rule configuration
+- Created FluxState interface for resource management
+- Created LevelConfig interface for level configuration
+- Created ScoringConfig interface for scoring parameters
+- Created TransitionState enum (PLAYING | FADING_OUT | INTERSTITIAL | FADING_IN | READY)
+- Created TransitionConfig interface for transition configuration
+- Created AudioParams interface (replacing SoundEngine) for audio configuration
+- Created configuration interfaces: DifficultyScalingMode, LevelGenerationParams, MovementDetectionParams, GridSizingParams, AudioParams, ExpertSettings
+
+**Previous Turn Summary (Sprint 1.1 - Project Setup & Build System):**
 
 - Initialized React + Vite project with TypeScript strict mode
 - Configured build system with vite.config.ts
