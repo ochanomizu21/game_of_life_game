@@ -131,28 +131,28 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 
 ### 1.6 Canvas Rendering (CRITICAL - Visualization)
 
-- [ ] Implement canvas setup (src/components/CanvasGrid.tsx)
+- [x] Implement canvas setup (src/components/CanvasGrid.tsx)
   - DPR scaling for sharp rendering (window.devicePixelRatio)
   - Responsive cell sizing (18px mobile, 20px desktop)
   - Window resize handling with coordinate recalculation
   - Set touch-action: none on canvas element for mobile
-- [ ] Implement grid rendering
+- [x] Implement grid rendering
   - Background color (#0a0a0f)
   - Grid lines toggle (G key, only during PLANNING)
   - Line color (#1a1a2e), 1px stroke
-- [ ] Implement cell rendering with age-based colors
+- [x] Implement cell rendering with age-based colors
   - Age 0: #00ffff (bright cyan, 15px glow)
   - Age 1-2: #61dafb (React blue, 8px glow)
   - Age 3-5: #ff00ff (magenta, 4px glow)
   - Age 6+: #4a00ff (deep purple, 2px glow)
   - Square cells with 2px corner radius
-- [ ] Implement glow effects
+- [x] Implement glow effects
   - Shadow blur based on age
   - Shadow color matches cell color
-- [ ] Implement intensity metric
+- [x] Implement intensity metric
   - CSS variable --life-intensity
   - Scaled from 0-500 cells
-- [ ] Optimize rendering pipeline
+- [x] Optimize rendering pipeline
   - Minimize context state changes
   - useCallback dependency tracking
 
@@ -973,6 +973,34 @@ _Goal: Stability, accessibility, and performance_
 - Keep code modular and maintainable for future enhancements
 
 ## Recent Progress:
+
+**Turn Summary (Sprint 1.6 - Canvas Rendering):**
+
+- Implemented CanvasGrid component in src/components/CanvasGrid.tsx
+- Created canvasUtils.ts helper module with color and blur functions
+- Implemented DPR scaling for sharp rendering on all displays
+- Implemented responsive cell sizing (18px mobile, 20px desktop)
+- Implemented grid rendering with toggleable grid lines
+- Implemented cell rendering with age-based colors:
+  - Age 0: #00ffff (bright cyan, 15px glow)
+  - Age 1-2: #61dafb (React blue, 8px glow)
+  - Age 3-5: #ff00ff (magenta, 4px glow)
+  - Age 6+: #4a00ff (deep purple, 2px glow)
+- Implemented glow effects with shadow blur based on age
+- Implemented intensity metric with CSS variable --life-intensity
+- Set touch-action: none on canvas for mobile interaction
+- Created comprehensive test suite with 14 tests for canvas utilities
+- All tests passing (123 total including existing tests)
+- Type checking and linting passing
+
+**Technical Decisions:**
+
+- Separated helper functions into canvasUtils.ts for better code organization
+- Used useCallback for draw function optimization
+- Used roundRect for cell rendering with corner radius
+- Implemented CSS variable --life-intensity for ambient effects (0-1 scale)
+- Grid lines toggleable via showGridLines prop (G key UI integration pending)
+- Canvas dimensions calculated as numCols \* cellSize
 
 **Turn Summary (Sprint 1.5 - Phase Management):**
 
