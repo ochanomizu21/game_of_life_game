@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react'
 import type { GridType } from '../types'
-import { CanvasGrid } from './CanvasGrid'
+import { CanvasGrid, type CellAnimation } from './CanvasGrid'
 import { getCellFromEvent, isWithinBounds } from '../lib/interaction'
 import { canPlaceCell, placeCell, removeCell } from '../lib/flux'
 import type { FluxState } from '../types'
@@ -31,6 +31,10 @@ export function GridInteraction({
   onFluxErrorSound,
 }: GridInteractionProps) {
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
+  const [animations, setAnimations] = useState<CellAnimation[]>([])
+  const [showInvalidAction, setShowInvalidAction] = useState<{ row: number; col: number } | null>(
+    null
+  )
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -51,6 +55,15 @@ export function GridInteraction({
             )
             onFluxChange(newFlux)
             onGridChange(newGrid)
+
+            const deathAnimation: CellAnimation = {
+              row,
+              col,
+              type: 'death',
+              startTime: window.performance.now(),
+              duration: 150,
+            }
+            setAnimations((prev) => [...prev, deathAnimation])
           }
         } else {
           if (canPlaceCell(flux)) {
@@ -61,8 +74,19 @@ export function GridInteraction({
             )
             onFluxChange(newFlux)
             onGridChange(newGrid)
+
+            const birthAnimation: CellAnimation = {
+              row,
+              col,
+              type: 'birth',
+              startTime: window.performance.now(),
+              duration: 100,
+            }
+            setAnimations((prev) => [...prev, birthAnimation])
           } else {
             onFluxErrorSound?.()
+            setShowInvalidAction({ row, col })
+            window.setTimeout(() => setShowInvalidAction(null), 200)
           }
         }
       } else if (interactionMode === 'ERASE') {
@@ -74,6 +98,15 @@ export function GridInteraction({
           )
           onFluxChange(newFlux)
           onGridChange(newGrid)
+
+          const deathAnimation: CellAnimation = {
+            row,
+            col,
+            type: 'death',
+            startTime: window.performance.now(),
+            duration: 150,
+          }
+          setAnimations((prev) => [...prev, deathAnimation])
         }
       }
     },
@@ -170,6 +203,8 @@ export function GridInteraction({
         grid={grid}
         showGridLines={showGridLines}
         cellSize={cellSize}
+        animations={animations}
+        showInvalidAction={showInvalidAction}
         onClick={handleCanvasClick}
         onMouseMove={handleCanvasMove}
         onMouseLeave={handleCanvasLeave}
