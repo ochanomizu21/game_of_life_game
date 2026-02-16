@@ -76,24 +76,67 @@ export function dispatchMultiple<A>(dispatch: Dispatch<A>, actions: A[]): void {
 
 export const STORAGE_KEY_PREFIX = 'gol-'
 
+function cleanupOldLocalStorageData(): void {
+  const keysToRemove: string[] = []
+  for (let i = 0; i < localStorage.length; i++) {
+    const key = localStorage.key(i)
+    if (key && key.startsWith(STORAGE_KEY_PREFIX)) {
+      keysToRemove.push(key)
+    }
+  }
+
+  keysToRemove.forEach((key) => {
+    try {
+      localStorage.removeItem(key)
+    } catch (error) {
+      console.error(`Failed to remove ${key} from localStorage:`, error)
+    }
+  })
+
+  console.warn(`Cleaned up ${keysToRemove.length} localStorage items`)
+}
+
 export function saveToLocalStorage<T>(key: string, value: T): boolean {
+  const fullKey = `${STORAGE_KEY_PREFIX}${key}`
+  const serialized = JSON.stringify(value)
+
   try {
-    const fullKey = `${STORAGE_KEY_PREFIX}${key}`
-    const serialized = JSON.stringify(value)
     localStorage.setItem(fullKey, serialized)
     return true
   } catch (error) {
+    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+      console.error('localStorage quota exceeded. Attempting cleanup...')
+      cleanupOldLocalStorageData()
+      try {
+        localStorage.setItem(fullKey, serialized)
+        return true
+      } catch (retryError) {
+        console.error('Failed to save to localStorage after cleanup:', retryError)
+        return false
+      }
+    }
     console.error('Failed to save to localStorage:', error)
     return false
   }
 }
 
-export function loadFromLocalStorage<T>(key: string, defaultValue: T): T {
+export function loadFromLocalStorage<T>(
+  key: string,
+  defaultValue: T,
+  validator?: (value: unknown) => value is T
+): T {
   try {
     const fullKey = `${STORAGE_KEY_PREFIX}${key}`
     const serialized = localStorage.getItem(fullKey)
     if (serialized === null) return defaultValue
+
     const parsed = JSON.parse(serialized) as T
+
+    if (validator && !validator(parsed)) {
+      console.warn(`Invalid data in localStorage for key: ${key}, using default value`)
+      return defaultValue
+    }
+
     return parsed
   } catch (error) {
     console.error('Failed to load from localStorage:', error)
@@ -108,6 +151,17 @@ export function removeFromLocalStorage(key: string): boolean {
     return true
   } catch (error) {
     console.error('Failed to remove from localStorage:', error)
+    return false
+  }
+}
+
+export function isLocalStorageAvailable(): boolean {
+  try {
+    const test = '__localStorage_test__'
+    localStorage.setItem(test, test)
+    localStorage.removeItem(test)
+    return true
+  } catch {
     return false
   }
 }
