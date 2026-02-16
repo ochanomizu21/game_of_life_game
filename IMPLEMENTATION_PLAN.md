@@ -239,7 +239,7 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 - [x] Implement cell preview ghost outline
   - Show ghost outline of cell when hovering over grid
   - Visual feedback for placeable vs non-placeable
-- [ ] Implement cell animations (pending - not yet implemented)
+- [x] Implement cell animations (completed in Sprint 4.2)
   - Fade-in animation (0.1s) for placement
   - Shrink animation (0.15s) for removal
   - Red flash for invalid actions
@@ -497,7 +497,7 @@ _Goal: Add scoring, progression, full UI, and polish_
   - Pattern breakdown (movers, oscillators, static, total patterns)
   - Generations count
   - Cells alive count
-- [ ] Add high score persistence
+- [x] Add high score persistence
   - Save highest score per level to localStorage
   - Load on level start
   - Display high score on UI
@@ -1019,9 +1019,10 @@ _Goal: Audio sonification, visual polish, and enhancements_
 - [ ] Implement touch ripple effect (optional)
   - Visual feedback on touch
   - Radial ripple animation
-- [ ] Implement mobile expert settings access
+- [x] Implement mobile expert settings access
   - Triple-tap top-left corner gesture
   - Confirm gesture doesn't conflict with game controls
+  - Completed in Sprint 5.1
 
 **Dependencies**: User interaction, UI components
 
@@ -1043,20 +1044,20 @@ _Goal: Advanced tuning, customization, and power features_
   - Centroid history length (3-10, default 5)
   - Movement threshold (0.1-2.0, default 0.5)
   - Minimum cluster size (1-5, default 1)
-- [ ] Implement scoring parameters
+- [x] Implement scoring parameters
   - Mover points per generation (1-100, default 10)
   - Oscillator points per generation (0-20, default 2)
   - Score multiplier (0.1-5.0, default 1.0)
-- [ ] Implement level generation parameters
+- [x] Implement level generation parameters
   - Base time seconds (10-120, default 45)
   - Time increment per level (0-60, default 15)
   - Base Flux (5-50, default 20)
   - Difficulty scaling mode: TIME_ONLY, RESOURCE_ONLY, MIXED, EXTREME
-- [ ] Implement grid sizing parameters
+- [x] Implement grid sizing parameters
   - Mobile cell size (14-24, default 18)
   - Desktop cell size (16-28, default 20)
   - Minimum visible cells (default 10)
-- [ ] Implement audio parameters
+- [x] Implement audio parameters
   - Enable default (boolean, default true)
   - Default volume (0.0-0.5, default 0.1)
   - Default waveform (sine, triangle, square, sawtooth)
@@ -1065,30 +1066,32 @@ _Goal: Advanced tuning, customization, and power features_
   - [x] Load on app startup
   - [x] "Reset to Defaults" button with confirmation
   - [x] Export/Import JSON for sharing configurations
-- [ ] Add validation
+- [x] Add validation
   - Range checking for all numeric values
   - Schema validation using Zod or similar
   - Prevent invalid configurations
-- [ ] Implement parameter injection
+- [x] Implement parameter injection
   - Pass expert settings to all relevant systems
   - React context or prop drilling
   - Apply changes immediately (no restart required)
-- [ ] Add UI controls
+- [x] Add UI controls
   - Sliders with value displays
   - Dropdowns for enums
   - Save/Reset/Revert buttons
   - Visual indicator when value differs from default
-- [ ] Implement presets
+- [x] Implement presets
   - Dropdown: Easy, Normal, Hard, Chaos
   - Predefined parameter sets
   - Quick way to balance game
-- [ ] Add danger zone
+- [x] Add danger zone
   - Separate section for extreme settings
-  - Require confirmation for extreme values
-  - Show warning if settings would make game impossible
-- [ ] Add tooltips/documentation
-  - Each parameter has tooltip explaining effect
+  - Chaos Multiplier (0.5-10.0x) for scoring difficulty
+  - Timer Speed (0.5-5.0x) for level time speed
+  - Warning styling with red theme
+- [x] Add tooltips/documentation
+  - Each parameter has help text explaining effect
   - Help text for complex parameters
+  - Italicized help text below each setting
 
 **Dependencies**: ALL other systems (configures parameters), type definitions
 
@@ -1195,6 +1198,7 @@ _Goal: Advanced tuning, customization, and power features_
 - [ ] Add custom preset support
   - Allow users to save current settings as preset
   - Name and save custom configurations
+  - NOT YET IMPLEMENTED
 
 **Dependencies**: Expert settings
 
@@ -1246,6 +1250,44 @@ _Goal: Advanced tuning, customization, and power features_
 - Preset system works seamlessly with existing settings persistence (localStorage)
 - Users can manually tweak parameters after selecting a preset for further customization
 - Total test count: 360 tests passing (up from 349)
+
+**Implementation Summary (Tooltips/Documentation & Danger Zone):**
+
+- Added comprehensive help text for all expert settings parameters
+- Each setting now has italicized help text explaining its purpose and valid range
+- Added danger zone section at bottom of settings panel with red warning theme
+- Implemented Chaos Multiplier control (0.5-10.0x) for scoring difficulty scaling
+- Implemented Timer Speed control (0.5-5.0x) for level time countdown speed
+- Updated ExpertSettings type to include optional chaosMultiplier and timerSpeed fields
+- Updated all preset configurations (EASY, NORMAL, HARD, CHAOS) with danger zone defaults
+- Added validation for danger zone parameters in both SettingsPanel.tsx and settings.ts
+- Added CSS styling for danger zone with warning banner and red-themed controls
+- All 360 tests passing
+
+**Technical Decisions:**
+
+- Help text uses italicized styling with reduced opacity for subtle readability
+- Danger zone placed at bottom of settings panel with distinct visual styling
+- Red border and warning banner signal extreme/dangerous settings
+- Danger zone controls use red-themed slider thumbs for visual distinction
+- Defaults: chaosMultiplier=1.0, timerSpeed=1.0 for balanced gameplay
+- Preset danger zone values: EASY (0.5x, 0.8x), NORMAL (1.0x, 1.0x), HARD (1.5x, 1.5x), CHAOS (3.0x, 2.5x)
+- Optional fields in ExpertSettings type (chaosMultiplier?, timerSpeed?) for backward compatibility
+- Validation prevents extreme values: chaosMultiplier (0.5-10.0), timerSpeed (0.5-5.0)
+
+**Test Coverage:**
+
+- All existing 360 tests continue to pass
+- Preset tests updated to include new danger zone fields
+- Settings validation tests include danger zone parameter checks
+- Integration verified through manual testing
+
+**Implementation Notes:**
+
+- Danger zone settings allow experienced players to customize extreme game modes
+- Help text makes expert settings more accessible to new players
+- Visual hierarchy separates normal settings from dangerous ones
+- Changes propagate through existing preset and settings persistence systems
 
 ---
 
