@@ -71,11 +71,15 @@ export function useTripleTapGesture(options: TripleTapGestureOptions) {
       }
     }
 
-    window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    if ('ontouchstart' in window) {
+      window.addEventListener('touchstart', handleTouchStart, { passive: false })
+    }
     window.addEventListener('click', handleClick)
 
     return () => {
-      window.removeEventListener('touchstart', handleTouchStart)
+      if ('ontouchstart' in window) {
+        window.removeEventListener('touchstart', handleTouchStart)
+      }
       window.removeEventListener('click', handleClick)
       if (timeoutRef.current) {
         window.clearTimeout(timeoutRef.current)

@@ -180,7 +180,7 @@ export function Game() {
     return grid.flat().filter((cell: number) => cell > 0).length > 0
   }, [grid])
 
-  const { phaseState, startCountdown, startRunning } = usePhaseTimer(hasCells)
+  const { phaseState, startCountdown, startRunning, finishPhase } = usePhaseTimer(hasCells)
 
   const levelStats = useMemo(() => {
     if (phaseState.current === 'FINISHED' && currentLevelConfig && scoreState.currentScore > 0) {
@@ -268,6 +268,13 @@ export function Game() {
     setScoreState(newScoreState)
     setGrid(result.newGrid)
     setGeneration(result.newGeneration)
+
+    if (phaseState.current === 'RUNNING') {
+      const aliveCount = result.newGrid.flat().filter((cell: number) => cell > 0).length
+      if (aliveCount === 0) {
+        finishPhase()
+      }
+    }
   }, [
     grid,
     generation,
@@ -276,6 +283,8 @@ export function Game() {
     movementConfig,
     scoringConfig,
     trackedClusters,
+    phaseState,
+    finishPhase,
   ])
 
   useEffect(() => {
@@ -299,7 +308,7 @@ export function Game() {
       startCountdown()
       startRunning(currentLevelConfig.timeLimitSeconds)
     }
-  }, [phaseState, startCountdown, hasCells, currentLevelConfig, startRunning])
+  }, [phaseState, startCountdown, hasCells, currentLevelConfig, startRunning, finishPhase])
 
   const handleGridChange = useCallback((newGrid: GridType) => {
     setGrid(newGrid)

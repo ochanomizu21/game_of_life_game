@@ -7,6 +7,7 @@ import {
   CELL_CORNER_RADIUS,
   BACKGROUND_COLOR,
   GRID_LINE_COLOR,
+  drawRoundedRect,
 } from '../lib/canvasUtils'
 
 export interface CellAnimation {
@@ -130,7 +131,7 @@ export function CanvasGrid({
           const radius = CELL_CORNER_RADIUS
 
           ctx.beginPath()
-          ctx.roundRect(x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, radius)
+          drawRoundedRect(ctx, x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, radius)
           ctx.fill()
           ctx.restore()
         }
@@ -161,7 +162,7 @@ export function CanvasGrid({
           const radius = CELL_CORNER_RADIUS
 
           ctx.beginPath()
-          ctx.roundRect(x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, radius)
+          drawRoundedRect(ctx, x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, radius)
           ctx.fill()
           ctx.restore()
         }
@@ -178,7 +179,7 @@ export function CanvasGrid({
       ctx.globalAlpha = 0.8
 
       ctx.beginPath()
-      ctx.roundRect(x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, 2)
+      drawRoundedRect(ctx, x + 1, y + 1, actualCellSize - 2, actualCellSize - 2, 2)
       ctx.stroke()
 
       ctx.restore()

@@ -1717,3 +1717,10 @@ _Goal: Stability, accessibility, and performance_
 - Cleaned up Recent Progress section by removing outdated turn summaries
 - Consolidated progress notes for better readability and maintainability
 - Documentation now reflects current implementation state accurately
+
+---
+
+**Turn Summary (2026-02-16):**
+
+- **Error Boundary (v0.0.1)**: Implemented global error boundary in Sprint 6.1 with user-friendly error UI, development-mode error details, reload functionality, and 4 tests passing
+- **Reduced Motion Support (v0.0.2)**: Implemented accessibility support in Sprint 6.2 by adding prefers-reduced-motion media queries to all 10 CSS files, disabling 76 animation/transition instances for users with motion sensitivity
