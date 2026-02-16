@@ -303,6 +303,14 @@ _Goal: Add scoring, progression, full UI, and polish_
 - Background simulation runs during intro
 - UI hidden during intro, shown after completion
 
+**Integration Completed (2026-02-16):**
+
+- Integrated IntroOverlay into App.tsx component
+- Added state management for intro display (isIntro state)
+- Implemented smooth transition from intro to game
+- Updated App.test.tsx to test intro integration
+- All 349 tests passing
+
 ### 2.2 Main UI Controls (HIGH - Full Interface)
 
 - [x] Implement glass HUD container (src/components/GlassHUD.tsx)
