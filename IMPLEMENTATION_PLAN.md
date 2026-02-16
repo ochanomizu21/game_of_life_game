@@ -486,7 +486,7 @@ _Goal: Add scoring, progression, full UI, and polish_
   - Smooth increment animation (lerp 0.2s)
   - Brief pulse/flash on point gain
   - Milestone flash every 100 points
-- [ ] Add pattern breakdown UI
+- [x] Add pattern breakdown UI
   - Active Movers count
   - Active Oscillators count
   - Current rate (points/gen)
@@ -1035,7 +1035,7 @@ _Goal: Advanced tuning, customization, and power features_
 
 - [x] Implement expert settings panel (src/components/SettingsPanel.tsx)
   - [x] Access via keyboard shortcut (`) - implemented in Game.tsx
-  - [ ] Settings menu (not yet implemented)
+  - [x] Settings menu (⚙️ gear button in GlassHUD.tsx:129-131)
   - [x] Mobile gesture (triple-tap) - implemented in useTripleTapGesture hook
   - [x] Modal overlay
   - [x] Collapsible sections by category
@@ -1184,12 +1184,12 @@ _Goal: Advanced tuning, customization, and power features_
 
 ### 5.2 Presets System (LOW - Convenience)
 
-- [ ] Implement preset configurations
+- [x] Implement preset configurations
   - Easy: Lower difficulty, generous resources
   - Normal: Balanced gameplay
   - Hard: Strict time/flux limits
   - Chaos: Extreme parameters, unpredictable
-- [ ] Implement preset selection UI
+- [x] Implement preset selection UI
   - Dropdown in Expert Settings
   - Preview preset values
 - [ ] Add custom preset support
@@ -1197,6 +1197,55 @@ _Goal: Advanced tuning, customization, and power features_
   - Name and save custom configurations
 
 **Dependencies**: Expert settings
+
+**Implementation Summary:**
+
+- Implemented Preset type in src/types/index.ts with four preset options: EASY, NORMAL, HARD, CHAOS
+- Implemented src/lib/presets.ts library with applyPreset(), getPresetDescription(), and preset configurations
+- Created four preset configurations with balanced parameter sets:
+  - EASY: Generous Flux (30), longer time limits (90s), lenient scoring (15pt movers, 3pt oscillators), lower movement threshold (0.3)
+  - NORMAL: Balanced Flux (20), standard time limits (60s), standard scoring (10pt movers, 2pt oscillators), standard movement threshold (0.5)
+  - HARD: Limited Flux (15), shorter time limits (40s), strict scoring (8pt movers, 1pt oscillators), higher movement threshold (0.7)
+  - CHAOS: Extreme Flux (10), very short time limits (30s), chaotic scoring (5pt movers, 1pt oscillators), low movement threshold (0.1), larger grid sizing (28px desktop, 22px mobile)
+- Updated SettingsPanel.tsx to include preset selector with description at top of panel
+- Updated SettingsPanel.css with preset section styling
+- Updated createInitialExpertSettings() in src/lib/state.ts to use NORMAL preset by default
+- Added comprehensive test suite with 11 tests covering all presets and edge cases
+- All tests passing (360 total)
+
+**Technical Decisions:**
+
+- Preset type defined as enum-like string union: 'EASY' | 'NORMAL' | 'HARD' | 'CHAOS'
+- applyPreset() performs deep clone using JSON.parse(JSON.stringify()) to prevent mutation issues
+- getPresetDescription() returns human-readable description for each preset explaining the balance and intended difficulty
+- Preset selector placed at top of SettingsPanel for easy access and visibility
+- Preset descriptions use glassmorphism styling with subtle background for readability
+- Default preset is NORMAL for balanced gameplay experience
+- All preset parameters validated against spec-defined ranges
+- Preset application immediately updates all expert settings without requiring panel close/reopen
+- Preset configurations include all expert settings: movement detection, scoring, level generation, grid sizing, and audio parameters
+
+**Test Coverage: 11 tests**
+
+- Preset type definition: 1 test
+- EASY preset configuration: 1 test
+- NORMAL preset configuration: 1 test
+- HARD preset configuration: 1 test
+- CHAOS preset configuration: 1 test
+- applyPreset() deep clone behavior: 1 test
+- applyPreset() applies correct values: 1 test
+- getPresetDescription() returns correct descriptions: 3 tests (EASY, NORMAL, HARD, CHAOS)
+- Invalid preset handling: 1 test
+
+**Integration Notes:**
+
+- Presets integrated into SettingsPanel as dropdown selector at top of panel
+- Preset selector onChange handler calls applyPreset() to update expert settings
+- Preset descriptions displayed below selector to explain each preset's characteristics
+- createInitialExpertSettings() now uses applyPreset('NORMAL') for default configuration
+- Preset system works seamlessly with existing settings persistence (localStorage)
+- Users can manually tweak parameters after selecting a preset for further customization
+- Total test count: 360 tests passing (up from 349)
 
 ---
 

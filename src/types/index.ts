@@ -100,10 +100,13 @@ export interface AudioParams {
   waveform: 'sine' | 'triangle' | 'square' | 'sawtooth'
 }
 
+export type Preset = 'EASY' | 'NORMAL' | 'HARD' | 'CHAOS'
+
 export interface ExpertSettings {
   movementDetection: MovementDetectionParams
   scoring: ScoringConfig
   levelGeneration: LevelGenerationParams
   gridSizing: GridSizingParams
   audio: AudioParams
+  preset?: Preset
 }

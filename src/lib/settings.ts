@@ -1,8 +1,6 @@
 import type { LevelGenerationParams, GridSizingParams, ExpertSettings } from '../types'
-import { createInitialMovementDetectionParams } from './movement'
-import { createInitialScoringConfig } from './scoring'
-import { createInitialAudioParams } from './audio'
 import { saveToLocalStorage, loadFromLocalStorage } from './state'
+import { applyPreset } from './presets'
 
 export { saveToLocalStorage, loadFromLocalStorage }
 
@@ -24,13 +22,7 @@ export function createInitialGridSizingParams(): GridSizingParams {
 }
 
 export function createInitialExpertSettings(): ExpertSettings {
-  return {
-    movementDetection: createInitialMovementDetectionParams(),
-    scoring: createInitialScoringConfig(),
-    levelGeneration: createInitialLevelGenerationParams(),
-    gridSizing: createInitialGridSizingParams(),
-    audio: createInitialAudioParams(),
-  }
+  return applyPreset('NORMAL')
 }
 
 export function validateExpertSettings(settings: ExpertSettings): boolean {

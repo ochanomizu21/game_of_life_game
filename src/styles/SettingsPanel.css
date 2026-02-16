@@ -99,6 +99,25 @@
   margin-bottom: 32px;
 }
 
+.preset-section {
+  background: rgba(97, 218, 251, 0.05);
+  border: 1px solid rgba(97, 218, 251, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+  margin-bottom: 32px;
+}
+
+.preset-description {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.9rem;
+  margin-bottom: 16px;
+  line-height: 1.4;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
 .settings-section:last-child {
   margin-bottom: 0;
 }

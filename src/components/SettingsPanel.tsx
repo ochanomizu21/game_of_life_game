@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import type { ExpertSettings } from '../types'
+import type { ExpertSettings, Preset } from '../types'
+import { applyPreset, getPresetDescription } from '../lib/presets'
 import '../styles/SettingsPanel.css'
 
 interface ValidationResult {
@@ -204,7 +205,17 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
     }
 
     target[keys[keys.length - 1]] = value
-    setLocalSettings(newSettings)
+
+    const updatedSettings: ExpertSettings = {
+      ...newSettings,
+      preset: undefined,
+    }
+    setLocalSettings(updatedSettings)
+  }
+
+  const handlePresetChange = (preset: Preset) => {
+    const presetSettings = applyPreset(preset)
+    setLocalSettings(presetSettings)
   }
 
   const handleSave = () => {
@@ -257,6 +268,26 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
         </div>
 
         <div className="settings-content">
+          <section className="settings-section preset-section">
+            <h3>Game Preset</h3>
+            <div className="preset-description">
+              {getPresetDescription(localSettings.preset ?? 'NORMAL')}
+            </div>
+            <div className="settings-row">
+              <label htmlFor="preset-select">Difficulty Preset</label>
+              <select
+                id="preset-select"
+                value={localSettings.preset ?? 'NORMAL'}
+                onChange={(e) => handlePresetChange(e.target.value as Preset)}
+                className="settings-select"
+              >
+                <option value="EASY">Easy</option>
+                <option value="NORMAL">Normal</option>
+                <option value="HARD">Hard</option>
+                <option value="CHAOS">Chaos</option>
+              </select>
+            </div>
+          </section>
           <section className="settings-section">
             <h3>Audio</h3>
             <div className="settings-row">
