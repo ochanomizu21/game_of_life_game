@@ -1,13 +1,25 @@
 import { useState } from 'react'
+import { LevelStats } from './LevelStats'
 import './VictoryScreen.css'
 
-export function VictoryScreen({
-  totalScore,
-  onPlayAgain,
-}: {
+interface VictoryScreenProps {
   totalScore: number
   onPlayAgain: () => void
-}) {
+  finalLevelStats?: {
+    finalScore: number
+    highScore: number
+    timeLimitSeconds: number
+    timeRemaining: number
+    finalGeneration: number
+    finalAliveCount: number
+    moversCount: number
+    oscillatorsCount: number
+    staticCount: number
+    totalPatternsTracked: number
+  }
+}
+
+export function VictoryScreen({ totalScore, onPlayAgain, finalLevelStats }: VictoryScreenProps) {
   const [isExiting, setIsExiting] = useState(false)
 
   const handlePlayAgain = () => {
@@ -36,6 +48,7 @@ export function VictoryScreen({
         <div className="victory-score-label">Total Score</div>
         <div className="victory-score-value">{totalScore}</div>
       </div>
+      {finalLevelStats && <LevelStats {...finalLevelStats} />}
       <button className="victory-button" onClick={handlePlayAgain}>
         Play Again
       </button>

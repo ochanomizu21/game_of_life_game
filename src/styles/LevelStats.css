@@ -1,0 +1,122 @@
+.level-stats {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  padding: 20px;
+  background: rgba(10, 10, 15, 0.9);
+  border: 1px solid rgba(97, 218, 251, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 20px auto;
+}
+
+.stats-section {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid rgba(97, 218, 251, 0.2);
+}
+
+.stats-section-title {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #00ffff;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-bottom: 1px solid rgba(97, 218, 251, 0.3);
+  padding-bottom: 8px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  font-size: 13px;
+}
+
+.stat-row:last-child {
+  margin-bottom: 0;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 500;
+}
+
+.stat-value {
+  color: #ffffff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.stat-value.new-high-score {
+  color: #ff00ff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.high-score-badge {
+  font-size: 10px;
+  background: linear-gradient(135deg, #ff00ff, #4a00ff);
+  color: #ffffff;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%,
+  100% {
+    box-shadow: 0 0 10px rgba(255, 0, 255, 0.5);
+  }
+  50% {
+    box-shadow: 0 0 20px rgba(255, 0, 255, 0.8);
+  }
+}
+
+.stat-value.mover-count {
+  color: #00ffff;
+  text-shadow: 0 0 8px rgba(0, 255, 255, 0.6);
+}
+
+.stat-value.oscillator-count {
+  color: #ff00ff;
+  text-shadow: 0 0 8px rgba(255, 0, 255, 0.6);
+}
+
+.stat-value.static-count {
+  color: #4a00ff;
+  text-shadow: 0 0 8px rgba(74, 0, 255, 0.6);
+}
+
+@media (max-width: 768px) {
+  .level-stats {
+    grid-template-columns: 1fr;
+    padding: 15px;
+    gap: 15px;
+  }
+
+  .stats-section {
+    padding: 12px;
+  }
+
+  .stats-section-title {
+    font-size: 12px;
+  }
+
+  .stat-row {
+    font-size: 12px;
+  }
+
+  .stat-value {
+    font-size: 13px;
+  }
+}
