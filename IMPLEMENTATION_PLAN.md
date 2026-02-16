@@ -1727,13 +1727,14 @@ _Goal: Stability, accessibility, and performance_
 **Current Status (2026-02-16):**
 
 - **Sprint 1-5 Complete**: MVP, scoring, levels, transitions, audio, visual polish, mobile, and expert settings fully implemented
-- **Sprint 6 In Progress**: Error Boundary completed, remaining items (accessibility, performance, testing, documentation) pending
+- **Sprint 6 In Progress**: Error Boundary completed, README.md completed, remaining items (accessibility, performance, testing) pending
 - **All 364 tests passing** with comprehensive coverage of implemented features
-- **Production-ready core game** with complete feature set
+- **Production-ready core game** with complete feature set and documentation
 
 **Recent Completion:**
 
 - **Sprint 6.1 Error Boundary**: Implemented global error boundary with user-friendly error UI, development-mode error details, and reload functionality. All 4 tests passing.
+- **Sprint 6.5 README.md (v0.1.8)**: Created comprehensive README.md with project overview, installation instructions, controls and gameplay guide, game mechanics explanation, configuration options, development section with project structure and tech stack, architecture highlights, known issues and limitations, and contributing guidelines.
 
 ---
 
