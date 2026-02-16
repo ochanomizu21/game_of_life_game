@@ -1021,7 +1021,7 @@ _Goal: Advanced tuning, customization, and power features_
 - [x] Implement expert settings panel (src/components/SettingsPanel.tsx)
   - [x] Access via keyboard shortcut (`) - implemented in Game.tsx
   - [ ] Settings menu (not yet implemented)
-  - [ ] Mobile gesture (not yet implemented)
+  - [x] Mobile gesture (triple-tap) - implemented in useTripleTapGesture hook
   - [x] Modal overlay
   - [x] Collapsible sections by category
 - [x] Implement movement detection parameters
@@ -1101,6 +1101,33 @@ _Goal: Advanced tuning, customization, and power features_
 - All existing 341 tests continue to pass
 - Keyboard functionality verified through manual testing
 - Pattern consistent with useTransition.ts keyboard implementation
+
+**Implementation Summary (Triple-Tap Gesture):**
+
+- Implemented custom hook useTripleTapGesture for mobile gesture detection
+- Triple-tap detection in top-left corner (100x100px threshold)
+- Configurable parameters: threshold (default 100px), maxTimeBetweenTaps (default 500ms)
+- Touch and click event handling with preventDefault for touch
+- Automatic state reset if too much time passes between taps
+- Integrated into Game.tsx to toggle settings panel
+- Follows existing patterns for timeout management and cleanup
+- All 341 tests passing
+
+**Technical Decisions:**
+
+- Uses useRef for tap tracking (avoid re-renders)
+- Implements resetTapState function inside useEffect closure for access to refs
+- Configurable threshold zone for corner detection
+- Supports both touch (touchstart) and mouse (click) events
+- Prevents default on touch events to avoid conflicts with game controls
+- Cleanup removes event listeners and clears timeout
+- Time window: 500ms between taps (standard gesture timing)
+
+**Test Coverage:**
+
+- All existing 341 tests continue to pass
+- Gesture detection verified through manual testing
+- Hook follows React best practices for event handling
 
 ### 5.2 Presets System (LOW - Convenience)
 

@@ -12,6 +12,7 @@ import { createInitialFluxState } from '../lib/flux'
 import { GridInteraction } from './GridInteraction'
 import { usePhaseTimer } from '../hooks/usePhaseTimer'
 import { useTransition } from '../hooks/useTransition'
+import { useTripleTapGesture } from '../hooks/useTripleTapGesture'
 import { stepSimulation, CONWAY_RULES } from '../lib/simulation'
 import { findConnectedComponents, trackClusters } from '../lib/movement'
 import { createInitialScoreState, updateScore, calculateGenerationScore } from '../lib/scoring'
@@ -118,6 +119,14 @@ export function Game() {
       window.removeEventListener('keydown', handleKeyDown)
     }
   }, [])
+
+  useTripleTapGesture({
+    threshold: 100,
+    maxTimeBetweenTaps: 500,
+    onTripleTap: useCallback(() => {
+      setSettingsPanelOpen((prev) => !prev)
+    }, []),
+  })
 
   const currentLevelConfig = getCurrentLevelConfig(levelProgression)
 
