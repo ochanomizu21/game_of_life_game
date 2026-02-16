@@ -126,3 +126,16 @@
     font-size: 0.8rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .transition-overlay,
+  .transition-overlay.fade-out,
+  .transition-overlay.fade-in,
+  .interstitial-content,
+  .level-complete-text,
+  .next-level-text {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+}

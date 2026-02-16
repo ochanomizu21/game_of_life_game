@@ -102,3 +102,13 @@
   white-space: pre-wrap;
   word-wrap: break-word;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .error-boundary-button {
+    transition: none;
+  }
+
+  .error-boundary-button:hover {
+    transform: none;
+  }
+}

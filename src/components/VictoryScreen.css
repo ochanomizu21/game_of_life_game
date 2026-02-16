@@ -151,3 +151,24 @@
     padding: 0.8rem 2rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .victory-overlay,
+  .victory-overlay.exiting,
+  .victory-title,
+  .victory-score-container,
+  .victory-button,
+  .victory-button::before {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+
+  .victory-button:hover {
+    transform: none;
+  }
+
+  .victory-button:active {
+    transform: none;
+  }
+}

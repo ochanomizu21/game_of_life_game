@@ -382,3 +382,27 @@
     width: 100%;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .settings-overlay,
+  .settings-panel,
+  .close-button,
+  .settings-slider,
+  .settings-slider::-webkit-slider-thumb,
+  .settings-slider::-moz-range-thumb,
+  .settings-select,
+  .settings-button {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+
+  .settings-slider::-webkit-slider-thumb:hover,
+  .settings-slider::-moz-range-thumb:hover {
+    transform: none;
+  }
+
+  .settings-button.primary:hover {
+    transform: none;
+  }
+}

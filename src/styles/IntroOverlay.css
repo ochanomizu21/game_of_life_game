@@ -157,3 +157,26 @@
     padding: 0.8rem 2rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .intro-overlay,
+  .intro-overlay.exiting,
+  .intro-title,
+  .intro-title.glitch,
+  .intro-title::before,
+  .intro-title::after,
+  .enter-button,
+  .enter-button::before {
+    animation: none;
+    transition: none;
+    transform: none;
+  }
+
+  .enter-button:hover {
+    transform: none;
+  }
+
+  .enter-button:active {
+    transform: none;
+  }
+}

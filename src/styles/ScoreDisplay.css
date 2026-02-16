@@ -163,3 +163,12 @@
     font-size: 0.7rem;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .score-value,
+  .score-value.pulse,
+  .score-value.milestone-flash {
+    animation: none;
+    transition: none;
+  }
+}

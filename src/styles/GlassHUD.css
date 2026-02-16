@@ -242,3 +242,20 @@
     gap: 10px;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .hud-button,
+  .hud-select,
+  .hud-slider,
+  .hud-slider::-webkit-slider-thumb,
+  .hud-slider::-moz-range-thumb,
+  .ui-toggle-button {
+    transition: none;
+    transform: none;
+  }
+
+  .hud-slider::-webkit-slider-thumb:hover,
+  .hud-slider::-moz-range-thumb:hover {
+    transform: none;
+  }
+}

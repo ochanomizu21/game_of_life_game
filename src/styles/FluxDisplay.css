@@ -13,3 +13,9 @@
 .flux-display-value.red {
   color: #ff4444;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  .flux-display-value {
+    transition: none;
+  }
+}

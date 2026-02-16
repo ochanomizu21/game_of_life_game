@@ -59,3 +59,9 @@ button:hover {
     background-color: #ffffff;
   }
 }
+
+@media (prefers-reduced-motion: reduce) {
+  button {
+    transition: none;
+  }
+}
