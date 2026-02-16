@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
 import { createGrid, GRID_SIZE_PRESETS, type GridSizePreset } from '../lib/simulation'
 import {
   type GridType,
@@ -61,18 +61,6 @@ export function Game() {
   const [isUiVisible, setIsUiVisible] = useState(true)
   const [highScore, setHighScore] = useState(0)
   const [trackedClusters, setTrackedClusters] = useState<TrackedCluster[]>([])
-  const [levelStats, setLevelStats] = useState<{
-    finalScore: number
-    highScore: number
-    timeLimitSeconds: number
-    timeRemaining: number
-    finalGeneration: number
-    finalAliveCount: number
-    moversCount: number
-    oscillatorsCount: number
-    staticCount: number
-    totalPatternsTracked: number
-  } | null>(null)
 
   const previousTrackedClustersRef = useRef<TrackedCluster[]>([])
   const previousPhaseRef = useRef<'PLANNING' | 'COUNTDOWN' | 'RUNNING' | 'FINISHED'>('PLANNING')
@@ -171,7 +159,6 @@ export function Game() {
       setGeneration(0)
       setScoreState(createInitialScoreState())
       previousTrackedClustersRef.current = []
-      setLevelStats(null)
     }
   }, [levelProgression, scoreState.currentScore, gridPreset])
 
@@ -194,6 +181,29 @@ export function Game() {
   }, [grid])
 
   const { phaseState, startCountdown, startRunning } = usePhaseTimer(hasCells)
+
+  const levelStats = useMemo(() => {
+    if (phaseState.current === 'FINISHED' && currentLevelConfig && scoreState.currentScore > 0) {
+      const staticCount = trackedClusters.filter((c) => c.classification === 'STATIC').length
+      const movers = trackedClusters.filter((c) => c.classification === 'MOVER').length
+      const oscillators = trackedClusters.filter((c) => c.classification === 'OSCILLATOR').length
+      const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
+
+      return {
+        finalScore: scoreState.currentScore,
+        highScore: getHighScore(currentLevelConfig.levelNumber),
+        timeLimitSeconds: currentLevelConfig.timeLimitSeconds,
+        timeRemaining: phaseState.timerRemaining,
+        finalGeneration: generation,
+        finalAliveCount: aliveCount,
+        moversCount: movers,
+        oscillatorsCount: oscillators,
+        staticCount: staticCount,
+        totalPatternsTracked: scoreState.totalPatternsTracked,
+      }
+    }
+    return null
+  }, [phaseState, currentLevelConfig, scoreState, generation, grid, trackedClusters])
 
   useEffect(() => {
     if (previousPhaseRef.current === 'COUNTDOWN' && phaseState.current === 'RUNNING') {
@@ -227,26 +237,8 @@ export function Game() {
       window.requestAnimationFrame(() => {
         setHighScore(getHighScore(currentLevelConfig.levelNumber))
       })
-
-      const staticCount = trackedClusters.filter((c) => c.classification === 'STATIC').length
-      const movers = trackedClusters.filter((c) => c.classification === 'MOVER').length
-      const oscillators = trackedClusters.filter((c) => c.classification === 'OSCILLATOR').length
-      const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
-
-      setLevelStats({
-        finalScore: scoreState.currentScore,
-        highScore: getHighScore(currentLevelConfig.levelNumber),
-        timeLimitSeconds: currentLevelConfig.timeLimitSeconds,
-        timeRemaining: phaseState.timerRemaining,
-        finalGeneration: generation,
-        finalAliveCount: aliveCount,
-        moversCount: movers,
-        oscillatorsCount: oscillators,
-        staticCount: staticCount,
-        totalPatternsTracked: scoreState.totalPatternsTracked,
-      })
     }
-  }, [phaseState, currentLevelConfig, scoreState, generation, grid, trackedClusters])
+  }, [phaseState, currentLevelConfig, scoreState])
 
   const handleSimulationStep = useCallback(() => {
     const currentState = {
@@ -325,7 +317,6 @@ export function Game() {
     setGeneration(0)
     setScoreState(createInitialScoreState())
     setTrackedClusters([])
-    setLevelStats(null)
   }, [gridPreset])
 
   const handleRandom = useCallback(() => {
@@ -346,7 +337,6 @@ export function Game() {
     setGeneration(0)
     setScoreState(createInitialScoreState())
     setTrackedClusters([])
-    setLevelStats(null)
   }, [gridPreset])
 
   const aliveCount = grid.flat().filter((cell: number) => cell > 0).length
@@ -430,7 +420,6 @@ export function Game() {
             setGeneration(0)
             setScoreState(createInitialScoreState())
             previousTrackedClustersRef.current = []
-            setLevelStats(null)
           }}
         />
       )}

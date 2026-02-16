@@ -204,20 +204,20 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
         } else {
           setImportError(`Invalid settings: ${validation.errors.join(', ')}`)
         }
-      } catch (error) {
+      } catch {
         setImportError('Failed to parse JSON file')
       }
     }
     reader.readAsText(file)
   }
 
-  const handleUpdate = (path: string, value: any) => {
+  const handleUpdate = (path: string, value: string | number | boolean) => {
     const newSettings = { ...localSettings }
     const keys = path.split('.')
-    let target: any = newSettings
+    let target: Record<string, unknown> = newSettings
 
     for (let i = 0; i < keys.length - 1; i++) {
-      target = target[keys[i]]
+      target = target[keys[i]] as Record<string, unknown>
     }
 
     target[keys[keys.length - 1]] = value

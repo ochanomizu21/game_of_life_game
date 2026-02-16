@@ -12,9 +12,4 @@ export default defineConfig({
       '@styles': '/src/styles',
     },
   },
-  test: {
-    globals: true,
-    environment: 'jsdom',
-    setupFiles: './src/test/setup.ts',
-  },
 })

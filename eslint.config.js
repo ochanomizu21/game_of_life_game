@@ -24,6 +24,10 @@ export default [
         console: 'readonly',
         localStorage: 'readonly',
         sessionStorage: 'readonly',
+        Blob: 'readonly',
+        URL: 'readonly',
+        FileReader: 'readonly',
+        HTMLInputElement: 'readonly',
         describe: 'readonly',
         it: 'readonly',
         expect: 'readonly',
@@ -58,6 +62,12 @@ export default [
       react: {
         version: 'detect',
       },
+    },
+  },
+  {
+    files: ['**/*.test.{ts,tsx}'],
+    rules: {
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
   {

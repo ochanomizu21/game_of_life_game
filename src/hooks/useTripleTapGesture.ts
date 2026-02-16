@@ -44,7 +44,7 @@ export function useTripleTapGesture(options: TripleTapGestureOptions) {
       }
 
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+        window.clearTimeout(timeoutRef.current)
       }
       timeoutRef.current = window.setTimeout(() => {
         resetTapState()
@@ -78,7 +78,7 @@ export function useTripleTapGesture(options: TripleTapGestureOptions) {
       window.removeEventListener('touchstart', handleTouchStart)
       window.removeEventListener('click', handleClick)
       if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
+        window.clearTimeout(timeoutRef.current)
       }
     }
   }, [threshold, maxTimeBetweenTaps, onTripleTap])

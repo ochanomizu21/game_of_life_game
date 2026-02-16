@@ -22,13 +22,14 @@ export function FluxDisplay({ flux, fluxMax, disableAnimation = false }: FluxDis
 
   const fluxColor = getFluxColor(flux, fluxMax)
 
+  const effectiveDisplayFlux = disableAnimation ? flux : displayFlux
+
   useEffect(() => {
     if (disableAnimation) {
-      setDisplayFlux(flux)
       return
     }
 
-    const startValue = displayFlux
+    const startValue = prevFluxRef.current
     const endValue = flux
 
     if (startValue === endValue) return
@@ -63,11 +64,11 @@ export function FluxDisplay({ flux, fluxMax, disableAnimation = false }: FluxDis
         window.cancelAnimationFrame(animationRef.current)
       }
     }
-  }, [flux])
+  }, [flux, disableAnimation])
 
   return (
     <span className={`flux-display-value ${fluxColor}`}>
-      {displayFlux}/{fluxMax}
+      {effectiveDisplayFlux}/{fluxMax}
     </span>
   )
 }

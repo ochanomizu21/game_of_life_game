@@ -25,10 +25,12 @@ export function ScoreDisplay({
   const [isPulsing, setIsPulsing] = useState(false)
   const [isMilestoneFlash, setIsMilestoneFlash] = useState(false)
   const lastProcessedScoreRef = useRef<number | null>(null)
+  const previousDisplayScoreRef = useRef(previousScore)
 
   useEffect(() => {
     if (lastProcessedScoreRef.current === null) {
       lastProcessedScoreRef.current = previousScore
+      previousDisplayScoreRef.current = previousScore
 
       if (previousScore !== score) {
         setIsPulsing(true)
@@ -46,6 +48,7 @@ export function ScoreDisplay({
       if (isMilestoneReached(score, previousScore)) {
         setIsMilestoneFlash(true)
       }
+      previousDisplayScoreRef.current = previousScore
     }
 
     lastProcessedScoreRef.current = previousScore
@@ -70,7 +73,7 @@ export function ScoreDisplay({
   useEffect(() => {
     const duration = 200
     const startTimestamp = window.performance.now()
-    const startValue = displayScore
+    const startValue = previousDisplayScoreRef.current
     const endValue = score
 
     if (startValue === endValue) return
@@ -86,11 +89,13 @@ export function ScoreDisplay({
 
       if (progress < 1) {
         window.requestAnimationFrame(animate)
+      } else {
+        previousDisplayScoreRef.current = endValue
       }
     }
 
     window.requestAnimationFrame(animate)
-  }, [score, displayScore])
+  }, [score])
 
   return (
     <div className="score-display-container">
