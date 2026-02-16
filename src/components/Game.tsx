@@ -22,6 +22,7 @@ import { SettingsPanel } from './SettingsPanel'
 import { TransitionOverlay } from './TransitionOverlay'
 import { VictoryScreen } from './VictoryScreen'
 import { UIToggleButton } from './UIToggleButton'
+import { Announcer } from './Announcer'
 import {
   createInitialExpertSettings,
   saveToLocalStorage,
@@ -47,6 +48,7 @@ export function Game() {
   const [generation, setGeneration] = useState(0)
   const [scoreState, setScoreState] = useState(() => createInitialScoreState())
   const [settingsPanelOpen, setSettingsPanelOpen] = useState(false)
+  const [announcement, setAnnouncement] = useState('')
   const [expertSettings, setExpertSettings] = useState<ExpertSettings>(() => {
     const saved = loadFromLocalStorage<ExpertSettings>(
       'gol-expert-settings',
@@ -148,6 +150,9 @@ export function Game() {
       }
       setLevelProgression(updatedProgression)
       setShowVictory(true)
+      setAnnouncement(
+        `Victory! All ${levelProgression.currentLevel} levels completed. Total score: ${levelProgression.totalScore + scoreState.currentScore} points.`
+      )
     } else {
       const newProgression = advanceLevel(levelProgression, scoreState.currentScore)
       const newLevelConfig = getCurrentLevelConfig(newProgression)
@@ -159,6 +164,9 @@ export function Game() {
       setGeneration(0)
       setScoreState(createInitialScoreState())
       previousTrackedClustersRef.current = []
+      setAnnouncement(
+        `Level ${levelProgression.currentLevel} complete. Score: ${scoreState.currentScore} points. Starting level ${newProgression.currentLevel}.`
+      )
     }
   }, [levelProgression, scoreState.currentScore, gridPreset])
 
@@ -210,7 +218,26 @@ export function Game() {
       soundEngineRef.current?.playSimulationStartSound()
     }
     previousPhaseRef.current = phaseState.current
-  }, [phaseState.current])
+
+    switch (phaseState.current) {
+      case 'PLANNING':
+        setAnnouncement(
+          `Planning phase. Level ${levelProgression.currentLevel}. Place your cells and start when ready.`
+        )
+        break
+      case 'COUNTDOWN':
+        setAnnouncement('Countdown. Simulation starting soon.')
+        break
+      case 'RUNNING':
+        setAnnouncement(
+          `Running phase. Simulation in progress. ${phaseState.timerRemaining} seconds remaining.`
+        )
+        break
+      case 'FINISHED':
+        setAnnouncement('Level finished.')
+        break
+    }
+  }, [phaseState.current, levelProgression.currentLevel])
 
   useEffect(() => {
     if (phaseState.current === 'FINISHED') {
@@ -385,6 +412,8 @@ export function Game() {
 
   return (
     <div style={{ padding: '20px', backgroundColor: '#0a0a0f', minHeight: '100vh', color: '#fff' }}>
+      <Announcer message={announcement} priority="polite" />
+
       <UIToggleButton isVisible={isUiVisible} onToggle={() => setIsUiVisible(!isUiVisible)} />
 
       <ScoreDisplay

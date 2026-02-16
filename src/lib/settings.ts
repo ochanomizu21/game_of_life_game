@@ -123,5 +123,9 @@ export function validateExpertSettings(settings: ExpertSettings): boolean {
     if (settings.timerSpeed < 0.5 || settings.timerSpeed > 5.0) return false
   }
 
+  if (settings.highContrastMode !== undefined) {
+    if (typeof settings.highContrastMode !== 'boolean') return false
+  }
+
   return true
 }

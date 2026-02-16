@@ -98,10 +98,12 @@ export function ScoreDisplay({
   }, [score])
 
   return (
-    <div className="score-display-container">
+    <div className="score-display-container" aria-live="polite" aria-atomic="false">
       <div className="score-display">
         <span
           className={`score-value ${isPulsing ? 'pulse' : ''} ${isMilestoneFlash ? 'milestone-flash' : ''}`}
+          role="status"
+          aria-label={`Score: ${formatScore(displayScore)} points`}
         >
           {formatScore(displayScore)}
         </span>
@@ -110,11 +112,16 @@ export function ScoreDisplay({
       {highScore > 0 && (
         <div className="high-score-display">
           <span className="high-score-label">HIGH:</span>
-          <span className="high-score-value">{formatScore(highScore)}</span>
+          <span
+            className="high-score-value"
+            aria-label={`High score: ${formatScore(highScore)} points`}
+          >
+            {formatScore(highScore)}
+          </span>
         </div>
       )}
       {showPatternBreakdown && (
-        <div className="score-breakdown">
+        <div className="score-breakdown" aria-label="Pattern breakdown">
           <div className="score-breakdown-item">
             <span className="breakdown-label">Movers:</span>
             <span className="breakdown-value">{movers}</span>

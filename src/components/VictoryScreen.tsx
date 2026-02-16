@@ -49,7 +49,7 @@ export function VictoryScreen({ totalScore, onPlayAgain, finalLevelStats }: Vict
         <div className="victory-score-value">{totalScore}</div>
       </div>
       {finalLevelStats && <LevelStats {...finalLevelStats} />}
-      <button className="victory-button" onClick={handlePlayAgain}>
+      <button className="victory-button" onClick={handlePlayAgain} aria-label="Play the game again">
         Play Again
       </button>
     </div>

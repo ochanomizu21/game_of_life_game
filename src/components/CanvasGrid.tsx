@@ -213,6 +213,8 @@ export function CanvasGrid({
       onClick={onClick}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
+      role="img"
+      aria-label={`Game of Life grid with ${grid.reduce((sum, row) => sum + row.filter((cell) => cell > 0).length, 0)} alive cells`}
     />
   )
 }

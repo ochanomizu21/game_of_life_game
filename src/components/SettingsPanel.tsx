@@ -159,6 +159,12 @@ function validateExpertSettingsDetailed(settings: unknown): ValidationResult {
     }
   }
 
+  if (s.highContrastMode !== undefined) {
+    if (typeof s.highContrastMode !== 'boolean') {
+      errors.push('highContrastMode must be a boolean')
+    }
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -276,11 +282,18 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
   if (!isOpen) return null
 
   return (
-    <div className="settings-overlay" onClick={onClose}>
-      <div className="settings-panel" onClick={(e) => e.stopPropagation()}>
+    <div className="settings-overlay" onClick={onClose} aria-hidden="true">
+      <div
+        className="settings-panel"
+        role="dialog"
+        aria-modal="true"
+        aria-label="Settings panel"
+        id="settings-panel"
+        onClick={(e) => e.stopPropagation()}
+      >
         <div className="settings-header">
           <h2>Settings</h2>
-          <button className="close-button" onClick={onClose}>
+          <button className="close-button" onClick={onClose} aria-label="Close settings">
             ×
           </button>
         </div>
@@ -654,6 +667,23 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
             </div>
             <div className="setting-help">
               Speed of game timer countdown (0.5-5.0x). Higher values make levels end much faster
+            </div>
+          </section>
+
+          <section className="settings-section accessibility-section">
+            <h3>Accessibility</h3>
+            <div className="settings-row">
+              <label htmlFor="high-contrast">High Contrast Mode</label>
+              <input
+                id="high-contrast"
+                type="checkbox"
+                checked={localSettings.highContrastMode ?? false}
+                onChange={(e) => handleUpdate('highContrastMode', e.target.checked)}
+                className="settings-checkbox"
+              />
+            </div>
+            <div className="setting-help">
+              Increases contrast and text size for improved readability and accessibility
             </div>
           </section>
         </div>

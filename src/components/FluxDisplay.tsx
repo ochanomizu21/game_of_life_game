@@ -67,7 +67,13 @@ export function FluxDisplay({ flux, fluxMax, disableAnimation = false }: FluxDis
   }, [flux, disableAnimation])
 
   return (
-    <span className={`flux-display-value ${fluxColor}`}>
+    <span
+      className={`flux-display-value ${fluxColor}`}
+      aria-live="polite"
+      aria-atomic="false"
+      role="status"
+      aria-label={`Flux: ${effectiveDisplayFlux} of ${fluxMax} available`}
+    >
       {effectiveDisplayFlux}/{fluxMax}
     </span>
   )

@@ -111,4 +111,5 @@ export interface ExpertSettings {
   preset?: Preset
   chaosMultiplier?: number
   timerSpeed?: number
+  highContrastMode?: boolean
 }

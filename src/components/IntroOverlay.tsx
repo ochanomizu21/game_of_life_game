@@ -15,7 +15,9 @@ export function IntroOverlay({ onEnter }: { onEnter: () => void }) {
     return (
       <div className={`intro-overlay exiting`}>
         <h1 className="intro-title glitch">CONWAY'S GAME OF LIFE</h1>
-        <button className="enter-button">ENTER VOID</button>
+        <button className="enter-button" aria-label="Start game">
+          ENTER VOID
+        </button>
       </div>
     )
   }
@@ -23,7 +25,7 @@ export function IntroOverlay({ onEnter }: { onEnter: () => void }) {
   return (
     <div className="intro-overlay">
       <h1 className="intro-title glitch">CONWAY'S GAME OF LIFE</h1>
-      <button className="enter-button" onClick={handleEnter}>
+      <button className="enter-button" onClick={handleEnter} aria-label="Start game">
         ENTER VOID
       </button>
     </div>

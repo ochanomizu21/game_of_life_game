@@ -48,7 +48,7 @@ export default class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBo
   render() {
     if (this.state.hasError) {
       return (
-        <div className="error-boundary">
+        <div className="error-boundary" role="alert" aria-live="assertive">
           <div className="error-boundary-content">
             <h1 className="error-boundary-title">Something went wrong</h1>
             <p className="error-boundary-message">
