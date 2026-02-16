@@ -112,6 +112,10 @@ export function Game() {
         e.preventDefault()
         setSettingsPanelOpen((prev) => !prev)
       }
+      if (e.code === 'KeyG') {
+        e.preventDefault()
+        setShowGridLines((prev) => !prev)
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)

@@ -159,6 +159,13 @@ _Goal: Basic Game of Life with visualization, interaction, and game flow_
 **Dependencies**: simulation-engine (needs grid state), type definitions
 **Enables**: grid-interaction, ui-overlay
 
+**G Key Integration Completed (2026-02-16):**
+
+- Added KeyG handler to Game.tsx keyboard event listener
+- G key toggles grid lines visibility during PLANNING phase
+- Follows same pattern as existing Backquote key for settings
+- All 349 tests passing
+
 ### 1.7 User Interaction (CRITICAL - Input Handling)
 
 - [x] Implement mouse event handling (src/lib/interaction.ts)
