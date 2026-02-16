@@ -1,5 +1,6 @@
 import type { GamePhase, InteractionMode } from '../types'
 import type { GridSizePreset } from '../lib/simulation'
+import { FluxDisplay } from './FluxDisplay'
 import '../styles/GlassHUD.css'
 
 interface GlassHUDProps {
@@ -15,6 +16,7 @@ interface GlassHUDProps {
   timerRemaining?: number
   canStart: boolean
   canInteract: boolean
+  disableFluxAnimation?: true
   onStart: () => void
   onStep: () => void
   onClear: () => void
@@ -38,6 +40,7 @@ export function GlassHUD({
   timerRemaining,
   canStart,
   canInteract,
+  disableFluxAnimation,
   onStart,
   onStep,
   onClear,
@@ -47,16 +50,6 @@ export function GlassHUD({
   onSetGridPreset,
   onToggleSettings,
 }: GlassHUDProps) {
-  const getFluxColor = (current: number, max: number): string => {
-    const ratio = current / max
-    if (ratio <= 0) return 'red'
-    if (ratio < 0.3) return 'orange'
-    if (ratio < 0.5) return 'orange'
-    return 'green'
-  }
-
-  const fluxColor = getFluxColor(flux, fluxMax)
-
   return (
     <div className="glass-hud-container">
       <div className="glass-hud">
@@ -165,7 +158,7 @@ export function GlassHUD({
             </div>
             <div className="hud-status-item">
               <span className="hud-status-label">Flux:</span>
-              <span className={`hud-status-value ${fluxColor}`}>{flux}</span>
+              <FluxDisplay flux={flux} fluxMax={fluxMax} disableAnimation={disableFluxAnimation} />
             </div>
           </div>
         </div>

@@ -1,0 +1,15 @@
+.flux-display-value {
+  transition: color 0.3s ease;
+}
+
+.flux-display-value.green {
+  color: #00ff00;
+}
+
+.flux-display-value.orange {
+  color: #ffaa00;
+}
+
+.flux-display-value.red {
+  color: #ff4444;
+}

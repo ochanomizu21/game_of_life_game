@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { GlassHUD } from './GlassHUD'
 
@@ -40,7 +40,7 @@ describe('GlassHUD', () => {
     expect(screen.getByText('Large')).toBeInTheDocument()
   })
 
-  it('should render status display', () => {
+  it('should render status display', async () => {
     render(<GlassHUD {...defaultProps} />)
 
     expect(screen.getByText('Phase:')).toBeInTheDocument()
@@ -48,7 +48,9 @@ describe('GlassHUD', () => {
     expect(screen.getByText('Flux:')).toBeInTheDocument()
     expect(screen.getByText('PLANNING')).toBeInTheDocument()
     expect(screen.getByText('10')).toBeInTheDocument()
-    expect(screen.getByText('20')).toBeInTheDocument()
+    await waitFor(() => {
+      expect(screen.getByText('20/20')).toBeInTheDocument()
+    })
   })
 
   it('should call onStart when START button clicked', async () => {
@@ -149,15 +151,15 @@ describe('GlassHUD', () => {
   })
 
   it('should display flux color based on value', () => {
-    const { rerender } = render(<GlassHUD {...defaultProps} flux={20} fluxMax={20} />)
-    const fluxValue = screen.getByText('20')
-    expect(fluxValue).toHaveClass('hud-status-value', 'green')
+    render(<GlassHUD {...defaultProps} flux={20} fluxMax={20} disableFluxAnimation />)
+    const fluxValue = screen.getByText('20/20')
+    expect(fluxValue).toHaveClass('flux-display-value', 'green')
 
-    rerender(<GlassHUD {...defaultProps} flux={5} fluxMax={20} />)
-    expect(fluxValue).toHaveClass('hud-status-value', 'orange')
+    render(<GlassHUD {...defaultProps} flux={5} fluxMax={20} disableFluxAnimation />)
+    expect(screen.getByText('5/20')).toHaveClass('flux-display-value', 'orange')
 
-    rerender(<GlassHUD {...defaultProps} flux={0} fluxMax={20} />)
-    expect(fluxValue).toHaveClass('hud-status-value', 'red')
+    render(<GlassHUD {...defaultProps} flux={0} fluxMax={20} disableFluxAnimation />)
+    expect(screen.getByText('0/20')).toHaveClass('flux-display-value', 'red')
   })
 
   it('should highlight active interaction mode', () => {

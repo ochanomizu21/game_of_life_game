@@ -876,7 +876,7 @@ _Goal: Audio sonification, visual polish, and enhancements_
   - Brief pulse/flash on point gain
   - Milestone flash every 100 points
   - Already implemented in ScoreDisplay.tsx
-- [ ] Implement Flux counter animation
+- [x] Implement Flux counter animation
   - Smooth transitions when values change
   - Color coding transitions (green → yellow → orange → red)
   - Color coding implemented, transitions not yet added
