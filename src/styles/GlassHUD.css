@@ -1,10 +1,10 @@
 .glass-hud {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 1rem;
-  color: #fff;
+  color: var(--color-text);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
 }
 
@@ -34,10 +34,10 @@
 
 .hud-button {
   background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.6em 1.2em;
-  color: #fff;
+  color: var(--color-text);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -46,7 +46,7 @@
 
 .hud-button:hover:not(:disabled) {
   background: rgba(97, 218, 251, 0.2);
-  border-color: #61dafb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
 }
 
@@ -58,39 +58,39 @@
 
 .hud-button.active {
   background: rgba(97, 218, 251, 0.3);
-  border-color: #61dafb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 15px rgba(97, 218, 251, 0.4);
 }
 
 .hud-button-danger {
-  color: #ff4444;
+  color: var(--color-danger);
 }
 
 .hud-button-danger:hover:not(:disabled) {
   background: rgba(255, 68, 68, 0.2);
-  border-color: #ff4444;
+  border-color: var(--color-danger);
   box-shadow: 0 0 10px rgba(255, 68, 68, 0.3);
 }
 
 .hud-select {
   background: rgba(26, 26, 26, 0.8);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.6em 1em;
-  color: #fff;
+  color: var(--color-text);
   font-size: 0.9rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .hud-select:hover {
-  border-color: #61dafb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
 }
 
 .hud-select option {
   background: #1a1a1a;
-  color: #fff;
+  color: var(--color-text);
 }
 
 .hud-slider-container {
@@ -104,7 +104,7 @@
   appearance: none;
   width: 100px;
   height: 6px;
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--color-border);
   border-radius: 3px;
   outline: none;
 }
@@ -114,7 +114,7 @@
   appearance: none;
   width: 18px;
   height: 18px;
-  background: #61dafb;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -129,7 +129,7 @@
 .hud-slider::-moz-range-thumb {
   width: 18px;
   height: 18px;
-  background: #61dafb;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -159,16 +159,16 @@
 }
 
 .hud-status-label {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
 }
 
 .hud-status-value {
-  color: #61dafb;
+  color: var(--color-primary);
   font-weight: bold;
 }
 
 .hud-status-value.green {
-  color: #00ff00;
+  color: var(--color-success);
 }
 
 .hud-status-value.orange {
@@ -176,19 +176,19 @@
 }
 
 .hud-status-value.red {
-  color: #ff4444;
+  color: var(--color-danger);
 }
 
 .ui-toggle-button {
   position: fixed;
   top: 20px;
   right: 20px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 10px;
-  color: #fff;
+  color: var(--color-text);
   cursor: pointer;
   transition: all 0.2s ease;
   z-index: 101;
@@ -201,7 +201,7 @@
 
 .ui-toggle-button:hover {
   background: rgba(255, 255, 255, 0.2);
-  border-color: #61dafb;
+  border-color: var(--color-primary);
   box-shadow: 0 0 10px rgba(97, 218, 251, 0.3);
 }
 
@@ -229,7 +229,7 @@
   .hud-select {
     min-width: 70px;
     padding: 0.5em 1em;
-    font-size: 0.8rem;
+    font-size: var(--font-size-base);
   }
 
   .hud-slider {
@@ -237,7 +237,7 @@
   }
 
   .hud-status {
-    font-size: 0.8rem;
+    font-size: var(--font-size-base);
     flex-direction: column;
     gap: 10px;
   }

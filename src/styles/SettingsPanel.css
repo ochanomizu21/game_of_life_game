@@ -36,6 +36,12 @@
   backdrop-filter: blur(10px);
 }
 
+[data-high-contrast='true'] .settings-panel {
+  background: #000000;
+  border: 2px solid #ffffff;
+  box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+}
+
 @keyframes slideUp {
   from {
     transform: translateY(20px);
@@ -57,7 +63,7 @@
 
 .settings-header h2 {
   color: rgba(255, 255, 255, 0.95);
-  font-size: 1.5rem;
+  font-size: var(--font-size-large);
   font-weight: 600;
   margin: 0;
   font-family:
@@ -65,6 +71,10 @@
     -apple-system,
     sans-serif;
   letter-spacing: 0.5px;
+}
+
+[data-high-contrast='true'] .settings-header h2 {
+  color: #ffffff;
 }
 
 .close-button {
@@ -124,7 +134,7 @@
 
 .settings-section h3 {
   color: rgba(97, 218, 251, 0.9);
-  font-size: 1.1rem;
+  font-size: var(--font-size-base);
   font-weight: 600;
   margin: 0 0 16px 0;
   font-family:
@@ -133,6 +143,10 @@
     sans-serif;
   letter-spacing: 0.3px;
   text-transform: uppercase;
+}
+
+[data-high-contrast='true'] .settings-section h3 {
+  color: #ffffff;
 }
 
 .settings-row {
@@ -191,7 +205,7 @@
   appearance: none;
   width: 16px;
   height: 16px;
-  background: #61dafb;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   box-shadow: 0 0 8px rgba(97, 218, 251, 0.5);
@@ -206,7 +220,7 @@
 .settings-slider::-moz-range-thumb {
   width: 16px;
   height: 16px;
-  background: #61dafb;
+  background: var(--color-primary);
   border-radius: 50%;
   cursor: pointer;
   border: none;
@@ -242,7 +256,7 @@
 
 .settings-select:focus {
   background: rgba(255, 255, 255, 0.1);
-  border-color: #61dafb;
+  border-color: var(--color-primary);
 }
 
 .settings-footer {
@@ -274,10 +288,21 @@
   box-shadow: 0 0 20px rgba(97, 218, 251, 0.3);
 }
 
+[data-high-contrast='true'] .settings-button.primary {
+  background: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+}
+
 .settings-button.primary:hover {
   background: rgba(97, 218, 251, 1);
   box-shadow: 0 0 30px rgba(97, 218, 251, 0.5);
   transform: translateY(-1px);
+}
+
+[data-high-contrast='true'] .settings-button.primary:hover {
+  background: #ffffff;
+  border: 2px solid #000000;
 }
 
 .settings-button.secondary {

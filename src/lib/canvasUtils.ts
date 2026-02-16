@@ -28,6 +28,7 @@ export const CELL_CORNER_RADIUS = 2
 
 export { BACKGROUND_COLOR, GRID_LINE_COLOR }
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 export function drawRoundedRect(
   ctx: any,
   x: number,
@@ -48,7 +49,8 @@ export function drawRoundedRect(
     ctx.lineTo(x + radius, y + height)
     ctx.quadraticCurveTo(x, y + height, x, y + height - radius)
     ctx.lineTo(x, y + radius)
-    ctx.quadraticCurveTo(x, y, x + radius, y)
+    ctx.quadraticCurveTo(x, y, x, y + radius)
     ctx.closePath()
   }
 }
+/* eslint-enable @typescript-eslint/no-explicit-any */

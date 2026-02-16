@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef, useMemo } from 'react'
+import { useState, useCallback, useEffect, useRef, useMemo, useLayoutEffect } from 'react'
 import { createGrid, GRID_SIZE_PRESETS, type GridSizePreset } from '../lib/simulation'
 import {
   type GridType,
@@ -51,7 +51,7 @@ export function Game() {
   const [announcement, setAnnouncement] = useState('')
   const [expertSettings, setExpertSettings] = useState<ExpertSettings>(() => {
     const saved = loadFromLocalStorage<ExpertSettings>(
-      'gol-expert-settings',
+      'expert-settings',
       createInitialExpertSettings()
     )
     return saved
@@ -95,6 +95,14 @@ export function Game() {
     soundEngineRef.current.setVolume(audioVolume)
     soundEngineRef.current.setWaveform(audioWaveform)
   }, [audioEnabled, audioVolume, audioWaveform])
+
+  useLayoutEffect(() => {
+    if (expertSettings.highContrastMode) {
+      document.documentElement.setAttribute('data-high-contrast', 'true')
+    } else {
+      document.documentElement.removeAttribute('data-high-contrast')
+    }
+  }, [expertSettings.highContrastMode])
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -389,7 +397,7 @@ export function Game() {
 
   const handleUpdateSettings = useCallback((newSettings: ExpertSettings) => {
     setExpertSettings(newSettings)
-    saveToLocalStorage('gol-expert-settings', newSettings)
+    saveToLocalStorage('expert-settings', newSettings)
   }, [])
 
   const handleStep = useCallback(() => {

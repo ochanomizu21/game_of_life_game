@@ -11,6 +11,11 @@
   margin: 20px auto;
 }
 
+[data-high-contrast='true'] .level-stats {
+  background: #000000;
+  border: 2px solid #ffffff;
+}
+
 .stats-section {
   background: rgba(0, 0, 0, 0.3);
   padding: 15px;
@@ -22,7 +27,7 @@
   margin: 0 0 12px 0;
   font-size: 14px;
   font-weight: 600;
-  color: #00ffff;
+  color: var(--color-focus);
   text-transform: uppercase;
   letter-spacing: 1px;
   border-bottom: 1px solid rgba(97, 218, 251, 0.3);
@@ -42,12 +47,12 @@
 }
 
 .stat-label {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
   font-weight: 500;
 }
 
 .stat-value {
-  color: #ffffff;
+  color: var(--color-text);
   font-weight: 600;
   font-size: 14px;
 }

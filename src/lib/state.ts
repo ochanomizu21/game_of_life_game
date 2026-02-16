@@ -104,7 +104,12 @@ export function saveToLocalStorage<T>(key: string, value: T): boolean {
     localStorage.setItem(fullKey, serialized)
     return true
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'QuotaExceededError') {
+    if (
+      error &&
+      typeof error === 'object' &&
+      'name' in error &&
+      (error as { name: string }).name === 'QuotaExceededError'
+    ) {
       console.error('localStorage quota exceeded. Attempting cleanup...')
       cleanupOldLocalStorageData()
       try {

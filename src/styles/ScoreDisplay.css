@@ -7,9 +7,9 @@
 }
 
 .score-display {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 12px;
   padding: 0.8rem 1.2rem;
   display: flex;
@@ -23,7 +23,7 @@
 .score-value {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #61dafb;
+  color: var(--color-primary);
   font-family: 'Courier New', monospace;
   text-shadow: 0 0 10px rgba(97, 218, 251, 0.5);
   transition: all 0.2s ease;
@@ -31,15 +31,15 @@
 
 .score-label {
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 2px;
 }
 
 .high-score-display {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--color-glass-bg);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--color-border);
   border-radius: 8px;
   padding: 0.4rem 0.8rem;
   display: flex;
@@ -51,7 +51,7 @@
 
 .high-score-label {
   font-size: 0.7rem;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
   text-transform: uppercase;
   letter-spacing: 1px;
 }
@@ -130,11 +130,11 @@
 }
 
 .breakdown-label {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--color-text-muted);
 }
 
 .breakdown-value {
-  color: #61dafb;
+  color: var(--color-primary);
   font-weight: bold;
   font-family: 'Courier New', monospace;
 }

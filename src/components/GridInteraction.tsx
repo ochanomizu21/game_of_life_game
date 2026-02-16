@@ -36,7 +36,7 @@ export function GridInteraction({
   const [showInvalidAction, setShowInvalidAction] = useState<{ row: number; col: number } | null>(
     null
   )
-  const containerRef = useRef<HTMLDivElement>(null)
+  const containerRef = useRef<any>(null)
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -162,7 +162,7 @@ export function GridInteraction({
   }, [])
 
   const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
+    (e: React.KeyboardEvent) => {
       if (phase !== 'PLANNING') return
 
       const numRows = grid.length
