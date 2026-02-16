@@ -139,3 +139,20 @@
     transform: none;
   }
 }
+
+[data-high-contrast='true'] .level-complete-text {
+  color: #ffffff;
+  text-shadow: none;
+  font-size: 3.5rem;
+}
+
+[data-high-contrast='true'] .next-level-text {
+  color: #ffffff;
+  text-shadow: none;
+  font-size: 3rem;
+}
+
+[data-high-contrast='true'] .skip-hint {
+  color: #ffffff;
+  font-weight: bold;
+}

@@ -19,3 +19,20 @@
     transition: none;
   }
 }
+
+[data-high-contrast='true'] .flux-display-value {
+  font-size: 1.1em;
+  font-weight: bold;
+}
+
+[data-high-contrast='true'] .flux-display-value.green {
+  color: #00ff00;
+}
+
+[data-high-contrast='true'] .flux-display-value.orange {
+  color: #ffaa00;
+}
+
+[data-high-contrast='true'] .flux-display-value.red {
+  color: #ff0000;
+}

@@ -112,3 +112,62 @@
     transform: none;
   }
 }
+
+[data-high-contrast='true'] .error-boundary-content {
+  border: 3px solid #ffffff;
+  background: #000000;
+}
+
+[data-high-contrast='true'] .error-boundary-title {
+  color: #ff0000;
+  font-size: 40px;
+}
+
+[data-high-contrast='true'] .error-boundary-message {
+  color: #ffffff;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+[data-high-contrast='true'] .error-boundary-button {
+  background: #00ffff;
+  color: #000000;
+  border: 3px solid #ffffff;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+[data-high-contrast='true'] .error-boundary-button:hover {
+  box-shadow: none;
+  border-color: #00ffff;
+}
+
+[data-high-contrast='true'] .error-boundary-button:focus {
+  outline: 3px solid #ffff00;
+}
+
+[data-high-contrast='true'] .error-boundary-details {
+  color: #ffffff;
+  font-size: 16px;
+}
+
+[data-high-contrast='true'] .error-boundary-details summary {
+  color: #00ffff;
+  font-weight: bold;
+  font-size: 18px;
+}
+
+[data-high-contrast='true'] .error-boundary-error {
+  border: 2px solid #ff0000;
+  background: #000000;
+}
+
+[data-high-contrast='true'] .error-boundary-error h3 {
+  color: #ff0000;
+  font-size: 18px;
+}
+
+[data-high-contrast='true'] .error-boundary-error pre {
+  background: #111;
+  color: #ffffff;
+}

@@ -180,3 +180,35 @@
     transform: none;
   }
 }
+
+[data-high-contrast='true'] .intro-overlay {
+  background: #000000;
+}
+
+[data-high-contrast='true'] .intro-title {
+  color: #ffffff;
+  text-shadow: none;
+  font-size: 3.5rem;
+}
+
+[data-high-contrast='true'] .intro-title::before {
+  display: none;
+}
+
+[data-high-contrast='true'] .intro-title::after {
+  display: none;
+}
+
+[data-high-contrast='true'] .enter-button {
+  background: #000000;
+  border: 3px solid #ffffff;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+[data-high-contrast='true'] .enter-button:hover {
+  background: #ffffff;
+  color: #000000;
+  box-shadow: none;
+}

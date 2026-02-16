@@ -172,3 +172,48 @@
     transition: none;
   }
 }
+
+[data-high-contrast='true'] .score-display {
+  border: 2px solid #ffffff;
+  background: #000000;
+}
+
+[data-high-contrast='true'] .score-value {
+  font-size: 3rem;
+  color: #ffffff;
+  text-shadow: none;
+}
+
+[data-high-contrast='true'] .score-label {
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 1em;
+}
+
+[data-high-contrast='true'] .high-score-display {
+  border: 2px solid #ffff00;
+  background: #000000;
+}
+
+[data-high-contrast='true'] .high-score-label {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+[data-high-contrast='true'] .high-score-value {
+  color: #ffff00;
+}
+
+[data-high-contrast='true'] .score-breakdown {
+  border: 2px solid #ffffff;
+  background: #000000;
+}
+
+[data-high-contrast='true'] .breakdown-label {
+  color: #ffffff;
+  font-weight: bold;
+}
+
+[data-high-contrast='true'] .breakdown-value {
+  color: #00ffff;
+}
