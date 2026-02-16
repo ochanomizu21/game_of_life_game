@@ -109,4 +109,6 @@ export interface ExpertSettings {
   gridSizing: GridSizingParams
   audio: AudioParams
   preset?: Preset
+  chaosMultiplier?: number
+  timerSpeed?: number
 }

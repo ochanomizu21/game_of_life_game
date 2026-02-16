@@ -113,5 +113,15 @@ export function validateExpertSettings(settings: ExpertSettings): boolean {
     return false
   }
 
+  if (settings.chaosMultiplier !== undefined) {
+    if (typeof settings.chaosMultiplier !== 'number') return false
+    if (settings.chaosMultiplier < 0.5 || settings.chaosMultiplier > 10.0) return false
+  }
+
+  if (settings.timerSpeed !== undefined) {
+    if (typeof settings.timerSpeed !== 'number') return false
+    if (settings.timerSpeed < 0.5 || settings.timerSpeed > 5.0) return false
+  }
+
   return true
 }

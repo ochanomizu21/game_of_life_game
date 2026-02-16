@@ -143,6 +143,22 @@ function validateExpertSettingsDetailed(settings: unknown): ValidationResult {
     }
   }
 
+  if (s.chaosMultiplier !== undefined) {
+    if (typeof s.chaosMultiplier !== 'number') {
+      errors.push('chaosMultiplier must be a number')
+    } else if (s.chaosMultiplier < 0.5 || s.chaosMultiplier > 10.0) {
+      errors.push('chaosMultiplier must be between 0.5 and 10.0')
+    }
+  }
+
+  if (s.timerSpeed !== undefined) {
+    if (typeof s.timerSpeed !== 'number') {
+      errors.push('timerSpeed must be a number')
+    } else if (s.timerSpeed < 0.5 || s.timerSpeed > 5.0) {
+      errors.push('timerSpeed must be between 0.5 and 5.0')
+    }
+  }
+
   return {
     valid: errors.length === 0,
     errors,
@@ -251,6 +267,8 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
         volume: 0.1,
         waveform: 'sine' as const,
       },
+      chaosMultiplier: 1.0,
+      timerSpeed: 1.0,
     }
     setLocalSettings(defaultSettings)
   }
@@ -287,6 +305,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 <option value="CHAOS">Chaos</option>
               </select>
             </div>
+            <div className="setting-help">
+              Quickly apply balanced difficulty presets that adjust multiple settings at once
+            </div>
           </section>
           <section className="settings-section">
             <h3>Audio</h3>
@@ -300,6 +321,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 />
                 Enable Sonification
               </label>
+            </div>
+            <div className="setting-help">
+              Generate sounds based on cell births and user interactions
             </div>
             <div className="settings-row">
               <label htmlFor="audio-volume">
@@ -316,6 +340,7 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">Master volume for all game sounds (0-50%)</div>
             <div className="settings-row">
               <label htmlFor="audio-waveform">Waveform</label>
               <select
@@ -334,6 +359,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 <option value="square">Square</option>
                 <option value="sawtooth">Sawtooth</option>
               </select>
+            </div>
+            <div className="setting-help">
+              Sound timbre: Sine (smooth), Triangle (rich), Square (harsh), Sawtooth (bright)
             </div>
           </section>
 
@@ -356,6 +384,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">
+              Generations of cluster centroid history to track for movement analysis (3-10)
+            </div>
             <div className="settings-row">
               <label htmlFor="movement-threshold">
                 Movement Threshold: {localSettings.movementDetection.movementThreshold.toFixed(1)}
@@ -373,6 +404,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">
+              Minimum distance (in cells) cluster must move to be classified as a MOVER (0.1-2.0)
+            </div>
             <div className="settings-row">
               <label htmlFor="movement-min-size">
                 Minimum Cluster Size: {localSettings.movementDetection.minClusterSize}
@@ -389,6 +423,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 }
                 className="settings-slider"
               />
+            </div>
+            <div className="setting-help">
+              Minimum number of cells in a cluster to track for scoring (1-5)
             </div>
           </section>
 
@@ -411,6 +448,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">
+              Points awarded per generation for each MOVER pattern (1-100)
+            </div>
             <div className="settings-row">
               <label htmlFor="scoring-oscillator">
                 Oscillator Points/Gen: {localSettings.scoring.oscillatorPointsPerGeneration}
@@ -428,6 +468,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">
+              Points awarded per generation for each OSCILLATOR pattern (0-20)
+            </div>
             <div className="settings-row">
               <label htmlFor="scoring-multiplier">
                 Score Multiplier: {localSettings.scoring.scoreMultiplier.toFixed(1)}x
@@ -444,6 +487,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 }
                 className="settings-slider"
               />
+            </div>
+            <div className="setting-help">
+              Global multiplier applied to all score calculations (0.1-5.0x)
             </div>
           </section>
 
@@ -466,6 +512,7 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">Base time limit (in seconds) for level 1 (10-120s)</div>
             <div className="settings-row">
               <label htmlFor="level-increment">
                 Time Increment/Level (s): {localSettings.levelGeneration.timeIncrementPerLevel}
@@ -483,6 +530,9 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">
+              Additional time (in seconds) added per level progression (0-60s)
+            </div>
             <div className="settings-row">
               <label htmlFor="level-flux">
                 Base Flux: {localSettings.levelGeneration.baseFlux}
@@ -498,6 +548,7 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">Initial Flux resource budget for each level (5-50)</div>
             <div className="settings-row">
               <label htmlFor="level-difficulty">Difficulty Mode</label>
               <select
@@ -516,6 +567,10 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 <option value="MIXED">Mixed</option>
                 <option value="EXTREME">Extreme</option>
               </select>
+            </div>
+            <div className="setting-help">
+              Difficulty scaling strategy: TIME_ONLY (decrease time), RESOURCE_ONLY (decrease Flux),
+              MIXED (both), EXTREME (both aggressive)
             </div>
           </section>
 
@@ -538,6 +593,7 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 className="settings-slider"
               />
             </div>
+            <div className="setting-help">Size of each cell on mobile devices (14-24px)</div>
             <div className="settings-row">
               <label htmlFor="grid-desktop">
                 Desktop Cell Size (px): {localSettings.gridSizing.desktopCellSize}
@@ -554,6 +610,50 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 }
                 className="settings-slider"
               />
+            </div>
+            <div className="setting-help">Size of each cell on desktop devices (16-28px)</div>
+          </section>
+
+          <section className="settings-section danger-zone">
+            <h3>⚠️ Danger Zone</h3>
+            <div className="danger-warning">
+              Warning: These settings can make the game extremely difficult or impossible to play.
+              Use with caution!
+            </div>
+            <div className="settings-row">
+              <label htmlFor="danger-multiplier">
+                Chaos Multiplier: {localSettings.chaosMultiplier ?? 1.0}x
+              </label>
+              <input
+                id="danger-multiplier"
+                type="range"
+                min="0.5"
+                max="10.0"
+                step="0.5"
+                value={localSettings.chaosMultiplier ?? 1.0}
+                onChange={(e) => handleUpdate('chaosMultiplier', parseFloat(e.target.value))}
+                className="settings-slider danger-slider"
+              />
+            </div>
+            <div className="setting-help">
+              Multiplies scoring difficulty (0.5-10.0x). Higher values make earning points much
+              harder
+            </div>
+            <div className="settings-row">
+              <label htmlFor="danger-timer">Timer Speed: {localSettings.timerSpeed ?? 1.0}x</label>
+              <input
+                id="danger-timer"
+                type="range"
+                min="0.5"
+                max="5.0"
+                step="0.5"
+                value={localSettings.timerSpeed ?? 1.0}
+                onChange={(e) => handleUpdate('timerSpeed', parseFloat(e.target.value))}
+                className="settings-slider danger-slider"
+              />
+            </div>
+            <div className="setting-help">
+              Speed of game timer countdown (0.5-5.0x). Higher values make levels end much faster
             </div>
           </section>
         </div>

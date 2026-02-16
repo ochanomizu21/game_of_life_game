@@ -28,6 +28,8 @@ export const PRESET_CONFIGS: Record<Preset, Omit<ExpertSettings, 'preset'>> = {
       volume: 0.1,
       waveform: 'sine',
     },
+    chaosMultiplier: 0.5,
+    timerSpeed: 0.8,
   } as Omit<ExpertSettings, 'preset'>,
   NORMAL: {
     movementDetection: {
@@ -56,6 +58,8 @@ export const PRESET_CONFIGS: Record<Preset, Omit<ExpertSettings, 'preset'>> = {
       volume: 0.1,
       waveform: 'sine',
     },
+    chaosMultiplier: 1.0,
+    timerSpeed: 1.0,
   } as Omit<ExpertSettings, 'preset'>,
   HARD: {
     movementDetection: {
@@ -84,6 +88,8 @@ export const PRESET_CONFIGS: Record<Preset, Omit<ExpertSettings, 'preset'>> = {
       volume: 0.1,
       waveform: 'sine',
     },
+    chaosMultiplier: 1.5,
+    timerSpeed: 1.5,
   } as Omit<ExpertSettings, 'preset'>,
   CHAOS: {
     movementDetection: {
@@ -112,6 +118,8 @@ export const PRESET_CONFIGS: Record<Preset, Omit<ExpertSettings, 'preset'>> = {
       volume: 0.1,
       waveform: 'sawtooth',
     },
+    chaosMultiplier: 3.0,
+    timerSpeed: 2.5,
   } as Omit<ExpertSettings, 'preset'>,
 }
 

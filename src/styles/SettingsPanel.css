@@ -162,6 +162,19 @@
   margin-right: 8px;
 }
 
+.setting-help {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.8rem;
+  line-height: 1.4;
+  margin-top: -8px;
+  margin-bottom: 16px;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  font-style: italic;
+}
+
 .settings-slider {
   flex: 0 0 150px;
   -webkit-appearance: none;
@@ -294,6 +307,48 @@
 
 .settings-content::-webkit-scrollbar-thumb:hover {
   background: rgba(97, 218, 251, 0.5);
+}
+
+.danger-zone {
+  border: 2px solid rgba(255, 87, 87, 0.3);
+  border-radius: 8px;
+  padding: 20px;
+  margin-top: 40px;
+  background: rgba(255, 87, 87, 0.05);
+}
+
+.danger-zone h3 {
+  color: rgba(255, 87, 87, 0.9);
+}
+
+.danger-warning {
+  color: rgba(255, 87, 87, 0.9);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  padding: 12px;
+  background: rgba(255, 87, 87, 0.1);
+  border-left: 3px solid rgba(255, 87, 87, 0.8);
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.danger-slider::-webkit-slider-thumb {
+  background: #ff5757;
+  box-shadow: 0 0 8px rgba(255, 87, 87, 0.5);
+}
+
+.danger-slider::-webkit-slider-thumb:hover {
+  box-shadow: 0 0 12px rgba(255, 87, 87, 0.7);
+}
+
+.danger-slider::-moz-range-thumb {
+  background: #ff5757;
+  border: none;
+  box-shadow: 0 0 8px rgba(255, 87, 87, 0.5);
+}
+
+.danger-slider::-moz-range-thumb:hover {
+  box-shadow: 0 0 12px rgba(255, 87, 87, 0.7);
 }
 
 @media (max-width: 768px) {
