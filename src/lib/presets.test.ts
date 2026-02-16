@@ -1,8 +1,26 @@
-import { describe, it, expect } from 'vitest'
-import { applyPreset, getPresetDescription } from '../lib/presets'
+import { describe, it, expect, beforeEach, afterEach } from 'vitest'
+import {
+  applyCustomPreset,
+  applyPreset,
+  deleteCustomPreset,
+  getCustomPresets,
+  getPresetDescription,
+  isCustomPresetNameAvailable,
+  saveCustomPreset,
+} from '../lib/presets'
 import { validateExpertSettings } from '../lib/settings'
 
+const CUSTOM_PRESETS_STORAGE_KEY = 'gol-custom-presets'
+
 describe('presets', () => {
+  beforeEach(() => {
+    localStorage.clear()
+  })
+
+  afterEach(() => {
+    localStorage.clear()
+  })
+
   describe('applyPreset', () => {
     it('should apply EASY preset with generous settings', () => {
       const settings = applyPreset('EASY')
@@ -127,6 +145,141 @@ describe('presets', () => {
     it('should return correct description for CHAOS preset', () => {
       const description = getPresetDescription('CHAOS')
       expect(description).toBe('Extreme settings with rapid changes and high scoring potential')
+    })
+  })
+
+  describe('custom presets', () => {
+    describe('getCustomPresets', () => {
+      it('should return empty array when no custom presets exist', () => {
+        const presets = getCustomPresets()
+        expect(presets).toEqual([])
+      })
+
+      it('should return array of custom presets when they exist', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test Preset', testSettings)
+
+        const presets = getCustomPresets()
+        expect(presets).toHaveLength(1)
+        expect(presets[0].name).toBe('Test Preset')
+      })
+
+      it('should return empty array when localStorage contains invalid data', () => {
+        localStorage.setItem(CUSTOM_PRESETS_STORAGE_KEY, 'invalid json')
+
+        const presets = getCustomPresets()
+        expect(presets).toEqual([])
+      })
+    })
+
+    describe('saveCustomPreset', () => {
+      it('should save custom preset to localStorage', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('My Preset', testSettings)
+
+        const presets = getCustomPresets()
+        expect(presets).toHaveLength(1)
+        expect(presets[0].name).toBe('My Preset')
+        expect(presets[0].settings).toBeDefined()
+        expect(presets[0].createdAt).toBeDefined()
+      })
+
+      it('should create deep copy of settings', () => {
+        const originalSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test', originalSettings)
+
+        originalSettings.scoring.moverPointsPerGeneration = 999
+
+        const presets = getCustomPresets()
+        expect(presets[0].settings.scoring.moverPointsPerGeneration).toBe(10)
+      })
+
+      it('should clear preset field from saved settings', () => {
+        const testSettings = applyPreset('NORMAL')
+        testSettings.preset = 'EASY'
+
+        saveCustomPreset('Test', testSettings)
+
+        const presets = getCustomPresets()
+        expect(presets[0].settings.preset).toBeUndefined()
+      })
+
+      it('should update existing preset with same name', () => {
+        const settings1 = applyPreset('EASY')
+        const settings2 = applyPreset('HARD')
+
+        saveCustomPreset('Test', settings1)
+        saveCustomPreset('Test', settings2)
+
+        const presets = getCustomPresets()
+        expect(presets).toHaveLength(1)
+        expect(presets[0].settings.scoring.moverPointsPerGeneration).toBe(8)
+      })
+    })
+
+    describe('deleteCustomPreset', () => {
+      it('should remove custom preset from localStorage', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test 1', testSettings)
+        saveCustomPreset('Test 2', testSettings)
+
+        deleteCustomPreset('Test 1')
+
+        const presets = getCustomPresets()
+        expect(presets).toHaveLength(1)
+        expect(presets[0].name).toBe('Test 2')
+      })
+
+      it('should not throw when deleting non-existent preset', () => {
+        expect(() => deleteCustomPreset('Non-existent')).not.toThrow()
+      })
+    })
+
+    describe('applyCustomPreset', () => {
+      it('should return null for non-existent preset', () => {
+        const settings = applyCustomPreset('Non-existent')
+        expect(settings).toBeNull()
+      })
+
+      it('should return settings for existing preset', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test', testSettings)
+
+        const appliedSettings = applyCustomPreset('Test')
+        expect(appliedSettings).not.toBeNull()
+        expect(appliedSettings?.scoring.moverPointsPerGeneration).toBe(10)
+      })
+
+      it('should create deep copy of settings', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test', testSettings)
+
+        const appliedSettings = applyCustomPreset('Test')
+        appliedSettings!.scoring.moverPointsPerGeneration = 999
+
+        const presets = getCustomPresets()
+        expect(presets[0].settings.scoring.moverPointsPerGeneration).toBe(10)
+      })
+    })
+
+    describe('isCustomPresetNameAvailable', () => {
+      it('should return true when no presets exist', () => {
+        expect(isCustomPresetNameAvailable('Test')).toBe(true)
+      })
+
+      it('should return true for new name when presets exist', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test 1', testSettings)
+
+        expect(isCustomPresetNameAvailable('Test 2')).toBe(true)
+      })
+
+      it('should return false for existing name', () => {
+        const testSettings = applyPreset('NORMAL')
+        saveCustomPreset('Test', testSettings)
+
+        expect(isCustomPresetNameAvailable('Test')).toBe(false)
+      })
     })
   })
 })

@@ -406,3 +406,137 @@
     transform: none;
   }
 }
+
+.custom-presets-list {
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid rgba(97, 218, 251, 0.1);
+}
+
+.custom-presets-list h4 {
+  color: rgba(97, 218, 251, 0.9);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin: 0 0 12px 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+}
+
+.custom-preset-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 6px;
+  margin-bottom: 8px;
+  transition: all 0.2s ease;
+}
+
+.custom-preset-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(97, 218, 251, 0.2);
+}
+
+.custom-preset-name {
+  color: rgba(255, 255, 255, 0.87);
+  font-size: 0.9rem;
+  font-weight: 400;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  flex: 1;
+}
+
+.custom-preset-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.custom-preset-dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1100;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.custom-preset-dialog {
+  background: rgba(10, 10, 15, 0.98);
+  border: 1px solid rgba(97, 218, 251, 0.3);
+  border-radius: 12px;
+  padding: 24px;
+  max-width: 400px;
+  width: 90vw;
+  box-shadow: 0 0 40px rgba(97, 218, 251, 0.2);
+  animation: slideUp 0.3s ease-out;
+  backdrop-filter: blur(10px);
+}
+
+.custom-preset-dialog h3 {
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 0 0 20px 0;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+}
+
+.custom-preset-dialog input[type='text'] {
+  width: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 6px;
+  color: rgba(255, 255, 255, 0.87);
+  padding: 10px 14px;
+  font-size: 0.95rem;
+  outline: none;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
+  transition: all 0.2s ease;
+}
+
+.custom-preset-dialog input[type='text']:focus {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: #61dafb;
+}
+
+.custom-preset-dialog input[type='text']::placeholder {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.custom-preset-dialog-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+  justify-content: flex-end;
+}
+
+.accessibility-section {
+  background: rgba(97, 218, 251, 0.05);
+  border: 1px solid rgba(97, 218, 251, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.settings-checkbox {
+  margin-right: 8px;
+  cursor: pointer;
+}

@@ -1195,14 +1195,15 @@ _Goal: Advanced tuning, customization, and power features_
 - [x] Implement preset selection UI
   - Dropdown in Expert Settings
   - Preview preset values
-- [ ] Add custom preset support
+- [x] Add custom preset support (COMPLETED 2026-02-16)
   - Allow users to save current settings as preset
   - Name and save custom configurations
-  - NOT YET IMPLEMENTED
+  - Load and delete custom presets
+  - Custom presets persisted to localStorage
 
 **Dependencies**: Expert settings
 
-**Implementation Summary:**
+**Implementation Summary (Custom Preset Support):**
 
 - Implemented Preset type in src/types/index.ts with four preset options: EASY, NORMAL, HARD, CHAOS
 - Implemented src/lib/presets.ts library with applyPreset(), getPresetDescription(), and preset configurations
@@ -1249,7 +1250,49 @@ _Goal: Advanced tuning, customization, and power features_
 - createInitialExpertSettings() now uses applyPreset('NORMAL') for default configuration
 - Preset system works seamlessly with existing settings persistence (localStorage)
 - Users can manually tweak parameters after selecting a preset for further customization
-- Total test count: 360 tests passing (up from 349)
+- Total test count: 389 tests passing (up from 374)
+
+**Implementation Summary (Custom Preset Support - 2026-02-16):**
+
+- Added CustomPreset interface to src/types/index.ts with name, settings, and createdAt fields
+- Implemented custom preset management functions in src/lib/presets.ts:
+  - getCustomPresets(): Retrieve all custom presets from localStorage
+  - saveCustomPreset(name, settings): Save current settings as custom preset
+  - deleteCustomPreset(name): Remove custom preset by name
+  - applyCustomPreset(name): Load and apply custom preset
+  - isCustomPresetNameAvailable(name): Check if preset name is unique
+- Updated SettingsPanel component with custom preset UI:
+  - "Save as Custom Preset" button to save current settings
+  - Modal dialog for entering preset name
+  - Custom preset list with Load/Delete buttons
+  - Custom presets added to preset dropdown selector
+  - Error handling for duplicate names and empty names
+- Custom presets persisted to localStorage under 'gol-custom-presets' key
+- Deep copy of settings saved to prevent mutation issues
+- Comprehensive CSS styling for custom preset dialog and list in SettingsPanel.css
+- Added 15 new tests for custom preset functionality (getCustomPresets, saveCustomPreset, deleteCustomPreset, applyCustomPreset, isCustomPresetNameAvailable)
+
+**Technical Decisions:**
+
+- Custom preset names must be unique and non-empty
+- Custom presets stored in separate localStorage key ('gol-custom-presets')
+- Settings deep copied before saving to prevent reference issues
+- preset field cleared from saved custom settings to avoid confusion
+- Custom preset list displayed below preset selector with Load/Delete actions
+- Modal dialog for entering preset name with Enter key support
+- Error messages displayed for duplicate names and empty names
+- Custom presets shown in dropdown with "custom:" prefix for identification
+- Applied custom presets create independent copies to prevent mutation
+
+**Test Coverage: 15 tests (new)**
+
+- getCustomPresets: 3 tests (empty array, existing presets, invalid data)
+- saveCustomPreset: 4 tests (save to localStorage, deep copy, clear preset field, update existing)
+- deleteCustomPreset: 2 tests (remove preset, non-existent preset)
+- applyCustomPreset: 3 tests (null for non-existent, return settings, deep copy)
+- isCustomPresetNameAvailable: 3 tests (no presets, new name, existing name)
+
+**Total: 389 tests passing (up from 374)**
 
 **Implementation Summary (Tooltips/Documentation & Danger Zone):**
 
@@ -1262,7 +1305,7 @@ _Goal: Advanced tuning, customization, and power features_
 - Updated all preset configurations (EASY, NORMAL, HARD, CHAOS) with danger zone defaults
 - Added validation for danger zone parameters in both SettingsPanel.tsx and settings.ts
 - Added CSS styling for danger zone with warning banner and red-themed controls
-- All 360 tests passing
+- All 389 tests passing
 
 **Technical Decisions:**
 

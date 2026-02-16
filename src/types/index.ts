@@ -113,3 +113,9 @@ export interface ExpertSettings {
   timerSpeed?: number
   highContrastMode?: boolean
 }
+
+export interface CustomPreset {
+  name: string
+  settings: ExpertSettings
+  createdAt: number
+}

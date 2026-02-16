@@ -1,6 +1,14 @@
-import { useState } from 'react'
-import type { ExpertSettings, Preset } from '../types'
-import { applyPreset, getPresetDescription } from '../lib/presets'
+import { useState, useEffect } from 'react'
+import type { CustomPreset, ExpertSettings, Preset } from '../types'
+import {
+  applyPreset,
+  applyCustomPreset,
+  deleteCustomPreset,
+  getPresetDescription,
+  getCustomPresets,
+  isCustomPresetNameAvailable,
+  saveCustomPreset,
+} from '../lib/presets'
 import '../styles/SettingsPanel.css'
 
 interface ValidationResult {
@@ -181,6 +189,14 @@ interface SettingsPanelProps {
 export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: SettingsPanelProps) {
   const [localSettings, setLocalSettings] = useState(settings)
   const [importError, setImportError] = useState<string>('')
+  const [customPresets, setCustomPresets] = useState<CustomPreset[]>([])
+  const [showCustomPresetDialog, setShowCustomPresetDialog] = useState(false)
+  const [customPresetName, setCustomPresetName] = useState('')
+  const [customPresetError, setCustomPresetError] = useState('')
+
+  useEffect(() => {
+    setCustomPresets(getCustomPresets())
+  }, [])
 
   const handleExport = () => {
     const dataStr = JSON.stringify(localSettings, null, 2)
@@ -235,9 +251,17 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
     setLocalSettings(updatedSettings)
   }
 
-  const handlePresetChange = (preset: Preset) => {
-    const presetSettings = applyPreset(preset)
-    setLocalSettings(presetSettings)
+  const handlePresetChange = (preset: Preset | string) => {
+    if (preset.startsWith('custom:')) {
+      const customPresetName = preset.slice(7)
+      const customSettings = applyCustomPreset(customPresetName)
+      if (customSettings) {
+        setLocalSettings(customSettings)
+      }
+    } else {
+      const presetSettings = applyPreset(preset as Preset)
+      setLocalSettings(presetSettings)
+    }
   }
 
   const handleSave = () => {
@@ -279,6 +303,35 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
     setLocalSettings(defaultSettings)
   }
 
+  const handleSaveCustomPreset = () => {
+    const trimmedName = customPresetName.trim()
+    if (!trimmedName) {
+      setCustomPresetError('Preset name cannot be empty')
+      return
+    }
+    if (!isCustomPresetNameAvailable(trimmedName)) {
+      setCustomPresetError('A preset with this name already exists')
+      return
+    }
+    saveCustomPreset(trimmedName, localSettings)
+    setCustomPresets(getCustomPresets())
+    setShowCustomPresetDialog(false)
+    setCustomPresetName('')
+    setCustomPresetError('')
+  }
+
+  const handleDeleteCustomPreset = (name: string) => {
+    deleteCustomPreset(name)
+    setCustomPresets(getCustomPresets())
+  }
+
+  const handleApplyCustomPreset = (name: string) => {
+    const preset = applyCustomPreset(name)
+    if (preset) {
+      setLocalSettings(preset)
+    }
+  }
+
   if (!isOpen) return null
 
   return (
@@ -316,11 +369,54 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
                 <option value="NORMAL">Normal</option>
                 <option value="HARD">Hard</option>
                 <option value="CHAOS">Chaos</option>
+                {customPresets.length > 0 && (
+                  <option value="" disabled>
+                    ── Custom Presets ──
+                  </option>
+                )}
+                {customPresets.map((preset) => (
+                  <option key={preset.name} value={`custom:${preset.name}`}>
+                    {preset.name}
+                  </option>
+                ))}
               </select>
             </div>
             <div className="setting-help">
               Quickly apply balanced difficulty presets that adjust multiple settings at once
             </div>
+            <button
+              className="settings-button secondary"
+              onClick={() => setShowCustomPresetDialog(true)}
+              style={{ marginTop: '10px' }}
+            >
+              Save as Custom Preset
+            </button>
+            {customPresets.length > 0 && (
+              <div className="custom-presets-list" style={{ marginTop: '15px' }}>
+                <h4>Custom Presets</h4>
+                {customPresets.map((preset) => (
+                  <div key={preset.name} className="custom-preset-item">
+                    <span className="custom-preset-name">{preset.name}</span>
+                    <div className="custom-preset-actions">
+                      <button
+                        className="settings-button secondary"
+                        onClick={() => handleApplyCustomPreset(preset.name)}
+                        style={{ padding: '4px 8px', fontSize: '12px' }}
+                      >
+                        Load
+                      </button>
+                      <button
+                        className="settings-button secondary"
+                        onClick={() => handleDeleteCustomPreset(preset.name)}
+                        style={{ padding: '4px 8px', fontSize: '12px' }}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </section>
           <section className="settings-section">
             <h3>Audio</h3>
@@ -713,6 +809,47 @@ export function SettingsPanel({ isOpen, settings, onClose, onUpdateSettings }: S
           </button>
           {importError && <div className="settings-error">{importError}</div>}
         </div>
+
+        {showCustomPresetDialog && (
+          <div
+            className="custom-preset-dialog-overlay"
+            onClick={() => setShowCustomPresetDialog(false)}
+          >
+            <div className="custom-preset-dialog" onClick={(e) => e.stopPropagation()}>
+              <h3>Save Custom Preset</h3>
+              <div className="settings-row">
+                <label htmlFor="custom-preset-name">Preset Name</label>
+                <input
+                  id="custom-preset-name"
+                  type="text"
+                  value={customPresetName}
+                  onChange={(e) => setCustomPresetName(e.target.value)}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') handleSaveCustomPreset()
+                  }}
+                  placeholder="Enter preset name..."
+                  autoFocus
+                />
+              </div>
+              {customPresetError && <div className="settings-error">{customPresetError}</div>}
+              <div className="custom-preset-dialog-actions">
+                <button
+                  className="settings-button secondary"
+                  onClick={() => {
+                    setShowCustomPresetDialog(false)
+                    setCustomPresetName('')
+                    setCustomPresetError('')
+                  }}
+                >
+                  Cancel
+                </button>
+                <button className="settings-button primary" onClick={handleSaveCustomPreset}>
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   )
