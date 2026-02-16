@@ -1045,11 +1045,11 @@ _Goal: Advanced tuning, customization, and power features_
   - Enable default (boolean, default true)
   - Default volume (0.0-0.5, default 0.1)
   - Default waveform (sine, triangle, square, sawtooth)
-- [ ] Implement configuration persistence
-  - Save settings to localStorage under key `gol-expert-settings`
-  - Load on app startup
-  - "Reset to Defaults" button with confirmation
-  - Export/Import JSON for sharing configurations
+- [x] Implement configuration persistence
+  - [x] Save settings to localStorage under key `gol-expert-settings`
+  - [x] Load on app startup
+  - [x] "Reset to Defaults" button with confirmation
+  - [x] Export/Import JSON for sharing configurations
 - [ ] Add validation
   - Range checking for all numeric values
   - Schema validation using Zod or similar
@@ -1128,6 +1128,44 @@ _Goal: Advanced tuning, customization, and power features_
 - All existing 341 tests continue to pass
 - Gesture detection verified through manual testing
 - Hook follows React best practices for event handling
+
+**Implementation Summary (Export/Import JSON):**
+
+- Implemented Export JSON button in SettingsPanel footer
+- Implemented Import JSON button with hidden file input
+- Export creates downloadable JSON file (gol-expert-settings.json)
+- Import loads JSON file with validation
+- Comprehensive validation for all expert settings parameters
+- Error message display for invalid imports
+- File format: JSON with pretty-printing (2-space indentation)
+- Blob-based file download with URL.createObjectURL
+- FileReader API for file upload
+- All 349 tests passing
+
+**Technical Decisions:**
+
+- Export uses Blob and URL.createObjectURL for download
+- Pretty-printed JSON with 2-space indentation
+- Import validates against all parameter ranges
+- Custom validation function returns detailed error messages
+- Hidden file input triggered via button click
+- Error state managed in component state
+- Invalid settings prevent import with user feedback
+
+**Validation Coverage:**
+
+- Movement detection: centroidHistoryLength (3-10), movementThreshold (0.1-2.0), minClusterSize (1-5)
+- Scoring: moverPointsPerGeneration (1-100), oscillatorPointsPerGeneration (0-20), scoreMultiplier (0.1-5.0)
+- Level generation: baseTimeSeconds (10-120), timeIncrementPerLevel (0-60), baseFlux (5-50), difficultyScalingMode (TIME_ONLY, RESOURCE_ONLY, MIXED, EXTREME)
+- Grid sizing: mobileCellSize (14-24), desktopCellSize (16-28), minVisibleCells (≥1)
+- Audio: enabled (boolean), volume (0-0.5), waveform (sine, triangle, square, sawtooth)
+
+**Test Coverage:**
+
+- All existing 349 tests continue to pass
+- Export functionality verified through manual testing
+- Import functionality verified with valid and invalid JSON files
+- Error handling tested for malformed JSON
 
 ### 5.2 Presets System (LOW - Convenience)
 
