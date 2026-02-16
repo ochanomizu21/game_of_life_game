@@ -9,6 +9,7 @@ interface ScoreDisplayProps {
   oscillators?: number
   rate?: number
   showPatternBreakdown?: boolean
+  highScore?: number
 }
 
 export function ScoreDisplay({
@@ -18,6 +19,7 @@ export function ScoreDisplay({
   oscillators = 0,
   rate = 0,
   showPatternBreakdown = false,
+  highScore = 0,
 }: ScoreDisplayProps) {
   const [displayScore, setDisplayScore] = useState(score)
   const [isPulsing, setIsPulsing] = useState(false)
@@ -100,6 +102,12 @@ export function ScoreDisplay({
         </span>
         <span className="score-label">PTS</span>
       </div>
+      {highScore > 0 && (
+        <div className="high-score-display">
+          <span className="high-score-label">HIGH:</span>
+          <span className="high-score-value">{formatScore(highScore)}</span>
+        </div>
+      )}
       {showPatternBreakdown && (
         <div className="score-breakdown">
           <div className="score-breakdown-item">

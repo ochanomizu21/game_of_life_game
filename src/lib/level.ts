@@ -1,5 +1,7 @@
 import type { LevelConfig, LevelProgression, LevelGenerationParams } from '../types'
 
+const HIGH_SCORE_STORAGE_KEY = 'gol-high-scores'
+
 const DEFAULT_TOTAL_LEVELS = 10
 
 function generateLevelConfig(levelNumber: number, params: LevelGenerationParams): LevelConfig {
@@ -123,4 +125,39 @@ export function regenerateProgression(
     totalScore: progression.totalScore,
     levels,
   }
+}
+
+function loadHighScores(): Record<number, number> {
+  try {
+    const stored = localStorage.getItem(HIGH_SCORE_STORAGE_KEY)
+    if (stored) {
+      return JSON.parse(stored)
+    }
+  } catch (e) {
+    console.warn('Failed to load high scores from localStorage:', e)
+  }
+  return {}
+}
+
+function saveHighScores(scores: Record<number, number>): void {
+  try {
+    localStorage.setItem(HIGH_SCORE_STORAGE_KEY, JSON.stringify(scores))
+  } catch (e) {
+    console.warn('Failed to save high scores to localStorage:', e)
+  }
+}
+
+export function saveHighScore(levelNumber: number, score: number): void {
+  const highScores = loadHighScores()
+  const currentHighScore = highScores[levelNumber] || 0
+
+  if (score > currentHighScore) {
+    highScores[levelNumber] = score
+    saveHighScores(highScores)
+  }
+}
+
+export function getHighScore(levelNumber: number): number {
+  const highScores = loadHighScores()
+  return highScores[levelNumber] || 0
 }
