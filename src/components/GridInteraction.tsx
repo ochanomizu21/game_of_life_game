@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, useRef } from 'react'
 import type { GridType } from '../types'
 import { CanvasGrid, type CellAnimation } from './CanvasGrid'
 import { getCellFromEvent, isWithinBounds } from '../lib/interaction'
@@ -31,10 +31,12 @@ export function GridInteraction({
   onFluxErrorSound,
 }: GridInteractionProps) {
   const [hoveredCell, setHoveredCell] = useState<{ row: number; col: number } | null>(null)
+  const [focusedCell, setFocusedCell] = useState<{ row: number; col: number } | null>(null)
   const [animations, setAnimations] = useState<CellAnimation[]>([])
   const [showInvalidAction, setShowInvalidAction] = useState<{ row: number; col: number } | null>(
     null
   )
+  const containerRef = useRef<HTMLDivElement>(null)
 
   const handleCellClick = useCallback(
     (row: number, col: number) => {
@@ -159,6 +161,51 @@ export function GridInteraction({
     setHoveredCell(null)
   }, [])
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (phase !== 'PLANNING') return
+
+      const numRows = grid.length
+      const numCols = grid[0].length
+
+      const currentFocused = focusedCell || { row: 0, col: 0 }
+      let newFocused = { ...currentFocused }
+
+      switch (e.key) {
+        case 'ArrowUp':
+          e.preventDefault()
+          newFocused.row = Math.max(0, currentFocused.row - 1)
+          setFocusedCell(newFocused)
+          break
+        case 'ArrowDown':
+          e.preventDefault()
+          newFocused.row = Math.min(numRows - 1, currentFocused.row + 1)
+          setFocusedCell(newFocused)
+          break
+        case 'ArrowLeft':
+          e.preventDefault()
+          newFocused.col = Math.max(0, currentFocused.col - 1)
+          setFocusedCell(newFocused)
+          break
+        case 'ArrowRight':
+          e.preventDefault()
+          newFocused.col = Math.min(numCols - 1, currentFocused.col + 1)
+          setFocusedCell(newFocused)
+          break
+        case 'Enter':
+        case ' ':
+          e.preventDefault()
+          handleCellClick(newFocused.row, newFocused.col)
+          break
+        case 'Escape':
+          e.preventDefault()
+          setFocusedCell(null)
+          break
+      }
+    },
+    [phase, grid, focusedCell, handleCellClick]
+  )
+
   const getCursor = useCallback(() => {
     if (phase !== 'PLANNING') return 'not-allowed'
 
@@ -194,11 +241,19 @@ export function GridInteraction({
   useEffect(() => {
     return () => {
       setHoveredCell(null)
+      setFocusedCell(null)
     }
   }, [grid])
 
   return (
-    <div style={{ position: 'relative', cursor: getCursor() }}>
+    <div
+      ref={containerRef}
+      style={{ position: 'relative', cursor: getCursor() }}
+      tabIndex={0}
+      role="grid"
+      aria-label="Game of Life grid. Use arrow keys to navigate, Enter or Space to place or remove cells."
+      onKeyDown={handleKeyDown}
+    >
       <CanvasGrid
         grid={grid}
         showGridLines={showGridLines}
@@ -220,6 +275,22 @@ export function GridInteraction({
             pointerEvents: 'none',
             border: `2px solid ${isPlaceable() ? '#00ffff' : isRemovable() ? '#ff00ff' : '#ff0000'}`,
             opacity: 0.5,
+            borderRadius: '2px',
+          }}
+        />
+      )}
+      {focusedCell && (
+        <div
+          style={{
+            position: 'absolute',
+            left: `${focusedCell.col * (cellSize || 20)}px`,
+            top: `${focusedCell.row * (cellSize || 20)}px`,
+            width: `${cellSize || 20}px`,
+            height: `${cellSize || 20}px`,
+            pointerEvents: 'none',
+            border: '3px solid #ffff00',
+            boxShadow: '0 0 10px #ffff00',
+            zIndex: 1000,
             borderRadius: '2px',
           }}
         />

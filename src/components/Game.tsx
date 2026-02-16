@@ -106,13 +106,19 @@ export function Game() {
         e.preventDefault()
         setShowGridLines((prev) => !prev)
       }
+      if (e.code === 'Escape') {
+        e.preventDefault()
+        if (settingsPanelOpen) {
+          setSettingsPanelOpen(false)
+        }
+      }
     }
 
     window.addEventListener('keydown', handleKeyDown)
     return () => {
       window.removeEventListener('keydown', handleKeyDown)
     }
-  }, [])
+  }, [settingsPanelOpen])
 
   useTripleTapGesture({
     threshold: 100,

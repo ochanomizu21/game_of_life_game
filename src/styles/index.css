@@ -53,6 +53,16 @@ button:hover {
   border-color: #646cff;
 }
 
+button:focus-visible {
+  outline: 3px solid #00ffff;
+  outline-offset: 2px;
+}
+
+:focus-visible {
+  outline: 3px solid #00ffff;
+  outline-offset: 2px;
+}
+
 @media (prefers-color-scheme: light) {
   :root {
     color: #213547;
