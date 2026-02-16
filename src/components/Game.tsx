@@ -105,6 +105,20 @@ export function Game() {
     soundEngineRef.current.setWaveform(audioWaveform)
   }, [audioEnabled, audioVolume, audioWaveform])
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.code === 'Backquote') {
+        e.preventDefault()
+        setSettingsPanelOpen((prev) => !prev)
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [])
+
   const currentLevelConfig = getCurrentLevelConfig(levelProgression)
 
   useEffect(() => {
