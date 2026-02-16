@@ -4,6 +4,10 @@ const HIGH_SCORE_STORAGE_KEY = 'gol-high-scores'
 
 const DEFAULT_TOTAL_LEVELS = 10
 
+export function isValidLevelNumber(levelNumber: number): boolean {
+  return Number.isInteger(levelNumber) && levelNumber >= 1
+}
+
 function generateLevelConfig(levelNumber: number, params: LevelGenerationParams): LevelConfig {
   const { baseTimeSeconds, timeIncrementPerLevel, baseFlux, difficultyScalingMode } = params
 
@@ -81,7 +85,13 @@ export function generateProgression(
 }
 
 export function getCurrentLevelConfig(progression: LevelProgression): LevelConfig | null {
-  if (progression.currentLevel < 1 || progression.currentLevel > progression.levels.length) {
+  if (
+    !isValidLevelNumber(progression.currentLevel) ||
+    progression.currentLevel > progression.levels.length
+  ) {
+    console.error(
+      `Invalid level number: ${progression.currentLevel}. Must be a positive integer between 1 and ${progression.levels.length}`
+    )
     return null
   }
   return progression.levels[progression.currentLevel - 1]
