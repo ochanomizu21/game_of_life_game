@@ -120,7 +120,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
   const [showDevSettings, setShowDevSettings] = useState(false);
   const [devMode, setDevMode] = useState(false);
   const [totalBlocks, setTotalBlocks] = useState(30);
-  const [phase2Duration, setPhase2Duration] = useState(60);
+  const [phase2Duration, setPhase2Duration] = useState(45);
   const [simulationSpeed, setSimulationSpeed] = useState(100);
 
   // --- Game State ---
@@ -792,7 +792,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
               <div className="overlay-content">
                   <h1>CHAOS CONTROL</h1>
                   <p>Phase 1: Place up to {totalBlocks} blocks (removable)</p>
-                  <p>Phase 2: {phase2Duration} seconds to score points by creating births</p>
+                  <p>Phase 2: 45 seconds to score points by creating births</p>
                   <button className="primary-btn" onClick={startGame}>START GAME</button>
                   <label className="dev-toggle">
                       <input 
@@ -833,12 +833,10 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
                   <span className="hud-label">Score:</span>
                   <span className="hud-value">{score}</span>
               </div>
-              {gamePhase === 'phase1' && (
-                  <div className="hud-stat">
-                      <span className="hud-label">Blocks:</span>
-                      <span className="hud-value">{blocksRemaining}</span>
-                  </div>
-              )}
+              <div className="hud-stat">
+                  <span className="hud-label">Blocks:</span>
+                  <span className="hud-value">{blocksRemaining}</span>
+              </div>
               {gamePhase === 'phase2' && (
                   <div className="hud-stat">
                       <span className="hud-label">Time:</span>
