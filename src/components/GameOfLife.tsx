@@ -826,10 +826,6 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
       {(gamePhase === 'phase1' || gamePhase === 'phase2') && (
           <div className="game-hud">
               <div className="hud-stat">
-                  <span className="hud-label">Phase:</span>
-                  <span className="hud-value">{gamePhase === 'phase1' ? '1 (Place)' : '2 (Score)'}</span>
-              </div>
-              <div className="hud-stat">
                   <span className="hud-label">Score:</span>
                   <span className="hud-value">{score}</span>
               </div>
@@ -846,7 +842,13 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
               {gamePhase === 'phase1' && (
                   <button className="hud-btn primary" onClick={startPhase2}>START SIMULATION</button>
               )}
-              <button className="hud-btn icon" onClick={restartGame}>🔄</button>
+              <button className="restart-btn" onClick={restartGame}>
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="M23 4v6h-6" />
+                      <path d="M1 20v-6h6" />
+                      <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" />
+                  </svg>
+              </button>
               {devMode && (
                   <button className="hud-btn icon" onClick={() => setShowDevSettings(!showDevSettings)}>⚙️</button>
               )}
