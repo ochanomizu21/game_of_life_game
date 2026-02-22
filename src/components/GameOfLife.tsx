@@ -1,5 +1,6 @@
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { soundEngine } from '../utils/SoundEngine';
+import '../game.css';
 
 // --- Types & Constants ---
 
@@ -115,6 +116,19 @@ const calculateGridDimensions = () => {
 };
 
 const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
+  // --- Dev Settings ---
+  const [showDevSettings, setShowDevSettings] = useState(false);
+  const [devMode, setDevMode] = useState(false);
+  const [totalBlocks, setTotalBlocks] = useState(30);
+  const [phase2Duration, setPhase2Duration] = useState(60);
+  const [simulationSpeed, setSimulationSpeed] = useState(100);
+
+  // --- Game State ---
+  const [gamePhase, setGamePhase] = useState<'menu' | 'phase1' | 'phase2' | 'gameover'>('menu');
+  const [score, setScore] = useState(0);
+  const [blocksRemaining, setBlocksRemaining] = useState(totalBlocks);
+  const [timeRemaining, setTimeRemaining] = useState(phase2Duration);
+
   // --- State ---
   const [numRows, setNumRows] = useState(() => calculateGridDimensions().rows);
   const [numCols, setNumCols] = useState(() => calculateGridDimensions().cols);
@@ -174,9 +188,63 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
   const selectedStampRef = useRef(selectedStamp);
   selectedStampRef.current = selectedStamp;
   
+  const gamePhaseRef = useRef(gamePhase);
+  gamePhaseRef.current = gamePhase;
+  
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const requestRef = useRef<number>();
   const lastUpdateRef = useRef<number>(0);
+  const timerRef = useRef<number>();
+
+  // --- Game Handlers ---
+  const startGame = () => {
+      setGamePhase('phase1');
+      setScore(0);
+      setBlocksRemaining(totalBlocks);
+      setTimeRemaining(phase2Duration);
+      gridRef.current = generateEmptyGrid(numRows, numCols);
+      setGeneration(0);
+      setRunning(false);
+      draw();
+  };
+
+  const startPhase2 = () => {
+      setGamePhase('phase2');
+      setRunning(true);
+      lastUpdateRef.current = performance.now();
+      timerRef.current = performance.now();
+  };
+
+  const endGame = () => {
+      setGamePhase('gameover');
+      setRunning(false);
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+  };
+
+  const restartGame = () => {
+      if (requestRef.current) cancelAnimationFrame(requestRef.current);
+      if (timerRef.current) clearInterval(timerRef.current);
+      startGame();
+  };
+
+  // Timer for phase 2
+  useEffect(() => {
+      if (gamePhase === 'phase2' && running) {
+          const timerInterval = setInterval(() => {
+              setTimeRemaining(prev => {
+                  if (prev <= 1) {
+                      endGame();
+                      return 0;
+                  }
+                  return prev - 1;
+              });
+          }, 1000);
+          timerRef.current = timerInterval as unknown as number;
+          
+          return () => clearInterval(timerInterval);
+      }
+  }, [gamePhase, running]);
 
   // Sync audio settings
   useEffect(() => {
@@ -362,6 +430,11 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
         soundEngine.playGenerationSound(bornCount, avgRow, rows);
       }
       
+      // Scoring in phase 2
+      if (gamePhaseRef.current === 'phase2' && bornCount > 0) {
+          setScore(prev => prev + bornCount);
+      }
+      
       // Update Gen Counter (State - triggers render)
       // To prevent UI lag on high speed, we could debounce this, but React 18 batching helps.
       setGeneration((gen) => gen + 1);
@@ -378,7 +451,9 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
       
       const deltaTime = time - lastUpdateRef.current;
       
-      if (deltaTime >= speedRef.current) {
+      const effectiveSpeed = gamePhaseRef.current === 'phase2' ? simulationSpeed : speedRef.current;
+      
+      if (deltaTime >= effectiveSpeed) {
           runStep();
           lastUpdateRef.current = time;
       }
@@ -543,16 +618,11 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
   const handleCellInteract = useCallback((r: number, c: number, type: 'down' | 'enter') => {
       if (type === 'enter' && !isMouseDownRef.current) return;
       
-      if (type === 'down' || (type === 'enter' && isMouseDownRef.current)) {
-          soundEngine.playInteractionSound(interactionModeRef.current === 'erase' ? 'erase' : 'draw');
-      }
-      
-      if (type === 'down') {
-          addToHistory(gridRef.current);
-      }
-
       const prev = gridRef.current;
       const mode = interactionModeRef.current;
+      const phase = gamePhaseRef.current;
+      
+      if (phase === 'menu' || phase === 'gameover') return;
       
       if (type === 'enter' && mode === 'stamp') return; 
       
@@ -572,13 +642,38 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
             });
          }
       } else {
-         newGrid[r][c] = val;
+         if (type === 'down') {
+             addToHistory(gridRef.current);
+         }
+
+         const wasAlive = prev[r][c] > 0;
+         const willBeAlive = val === 1;
+
+         if (phase === 'phase1') {
+             if (!wasAlive && willBeAlive) {
+                 if (blocksRemaining > 0) {
+                     newGrid[r][c] = val;
+                     setBlocksRemaining(b => b - 1);
+                     soundEngine.playInteractionSound('draw');
+                 }
+             } else if (wasAlive && !willBeAlive && mode === 'erase') {
+                 newGrid[r][c] = val;
+                 setBlocksRemaining(b => b + 1);
+                 soundEngine.playInteractionSound('erase');
+             }
+         } else if (phase === 'phase2') {
+             if (!wasAlive && willBeAlive && mode === 'draw' && blocksRemaining > 0) {
+                 newGrid[r][c] = val;
+                 setBlocksRemaining(b => b - 1);
+                 soundEngine.playInteractionSound('draw');
+             }
+         }
       }
       
       gridRef.current = newGrid;
       draw();
 
-  }, [draw]);
+  }, [draw, blocksRemaining]);
 
   const handleCanvasMouseDown = (e: React.MouseEvent<HTMLCanvasElement>) => {
       const canvas = canvasRef.current;
@@ -691,8 +786,101 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
         />
       </div>
 
+      {/* Game Menu Overlay */}
+      {gamePhase === 'menu' && (
+          <div className="game-overlay">
+              <div className="overlay-content">
+                  <h1>CHAOS CONTROL</h1>
+                  <p>Phase 1: Place up to {totalBlocks} blocks (removable)</p>
+                  <p>Phase 2: {phase2Duration} seconds to score points by creating births</p>
+                  <button className="primary-btn" onClick={startGame}>START GAME</button>
+                  <label className="dev-toggle">
+                      <input 
+                          type="checkbox" 
+                          checked={devMode} 
+                          onChange={(e) => setDevMode(e.target.checked)} 
+                      /> Dev Mode
+                  </label>
+                  {devMode && (
+                      <button className="dev-btn" onClick={() => setShowDevSettings(!showDevSettings)}>
+                          {showDevSettings ? 'Hide Dev Settings' : 'Show Dev Settings'}
+                      </button>
+                  )}
+              </div>
+          </div>
+      )}
+
+      {/* Game Over Overlay */}
+      {gamePhase === 'gameover' && (
+          <div className="game-overlay">
+              <div className="overlay-content">
+                  <h1>GAME OVER</h1>
+                  <p className="score-display">Final Score: {score}</p>
+                  <button className="primary-btn" onClick={restartGame}>PLAY AGAIN</button>
+                  <button className="secondary-btn" onClick={() => setGamePhase('menu')}>MAIN MENU</button>
+              </div>
+          </div>
+      )}
+
+      {/* Game HUD */}
+      {(gamePhase === 'phase1' || gamePhase === 'phase2') && (
+          <div className="game-hud">
+              <div className="hud-stat">
+                  <span className="hud-label">Phase:</span>
+                  <span className="hud-value">{gamePhase === 'phase1' ? '1 (Place)' : '2 (Score)'}</span>
+              </div>
+              <div className="hud-stat">
+                  <span className="hud-label">Score:</span>
+                  <span className="hud-value">{score}</span>
+              </div>
+              {gamePhase === 'phase1' && (
+                  <div className="hud-stat">
+                      <span className="hud-label">Blocks:</span>
+                      <span className="hud-value">{blocksRemaining}</span>
+                  </div>
+              )}
+              {gamePhase === 'phase2' && (
+                  <div className="hud-stat">
+                      <span className="hud-label">Time:</span>
+                      <span className="hud-value">{timeRemaining}s</span>
+                  </div>
+              )}
+              {gamePhase === 'phase1' && (
+                  <button className="hud-btn primary" onClick={startPhase2}>START SIMULATION</button>
+              )}
+              <button className="hud-btn icon" onClick={restartGame}>🔄</button>
+              {devMode && (
+                  <button className="hud-btn icon" onClick={() => setShowDevSettings(!showDevSettings)}>⚙️</button>
+              )}
+          </div>
+      )}
+
+      {/* Game Mode Interaction Controls */}
+      {isUiVisible && (gamePhase === 'phase1' || gamePhase === 'phase2') && (
+          <div className="glass-hud-container" style={{ bottom: '30px' }}>
+              <div className="glass-hud">
+                  <div className="hud-group">
+                      <button 
+                          className={`hud-btn ${interactionMode === 'draw' ? 'active' : ''}`}
+                          onClick={() => setInteractionMode('draw')}
+                      >
+                          DRAW
+                      </button>
+                      {gamePhase === 'phase1' && (
+                          <button 
+                              className={`hud-btn ${interactionMode === 'erase' ? 'active' : ''}`}
+                              onClick={() => setInteractionMode('erase')}
+                          >
+                              ERASE
+                          </button>
+                      )}
+                  </div>
+              </div>
+          </div>
+      )}
+
       {/* Toggle UI Button */}
-      {enableUI && (
+      {enableUI && (gamePhase === 'menu' || gamePhase === 'phase1' || gamePhase === 'phase2') && isUiVisible && (
         <button 
             className={`ui-toggle-btn ${!isUiVisible ? 'hidden-ui' : ''}`}
             onClick={() => setIsUiVisible(!isUiVisible)}
@@ -703,7 +891,7 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
       )}
 
       {/* Glass HUD Container */}
-      {enableUI && isUiVisible && (
+      {enableUI && isUiVisible && gamePhase !== 'menu' && gamePhase !== 'phase1' && gamePhase !== 'phase2' && gamePhase !== 'gameover' && (
       <div className="glass-hud-container">
         
         {/* Timeline Slider */}
@@ -773,35 +961,72 @@ const GameOfLife: React.FC<GameOfLifeProps> = ({ enableUI = true }) => {
 
           <div className="hud-group">
                <select 
-                    className="hud-select"
-                    value={waveform} 
-                    onChange={(e) => setWaveform(e.target.value as OscillatorType)}
-                    style={{marginRight: '0.5rem', marginLeft: 0}}
-                    title="Sound Waveform"
-                >
-                    <option value="sine">Sine</option>
-                    <option value="triangle">Triangle</option>
-                    <option value="square">Square</option>
-                    <option value="sawtooth">Saw</option>
-                </select>
+                     className="hud-select"
+                     value={waveform} 
+                     onChange={(e) => setWaveform(e.target.value as OscillatorType)}
+                     style={{marginRight: '0.5rem', marginLeft: 0}}
+                     title="Sound Waveform"
+                 >
+                     <option value="sine">Sine</option>
+                     <option value="triangle">Triangle</option>
+                     <option value="square">Square</option>
+                     <option value="sawtooth">Saw</option>
+                 </select>
                <input 
-                    type="range" 
-                    min="0" max="0.5" step="0.01"
-                    value={volume} 
-                    onChange={e => setVolume(Number(e.target.value))} 
-                    style={{width: '60px', marginRight: '1rem', height: '4px'}}
-                    title={`Volume: ${Math.round(volume * 200)}%`}
-               />
-               <span className="hud-stat">GEN: {generation}</span>
-               <button 
-                  className={`hud-btn icon ${showSettings ? 'active' : ''}`} 
-                  onClick={() => setShowSettings(!showSettings)}
-                >
-                   ⚙️
-               </button>
+                     type="range" 
+                     min="0" max="0.5" step="0.01"
+                     value={volume} 
+                     onChange={e => setVolume(Number(e.target.value))} 
+                     style={{width: '60px', marginRight: '1rem', height: '4px'}}
+                     title={`Volume: ${Math.round(volume * 200)}%`}
+                />
+                <span className="hud-stat">GEN: {generation}</span>
+                <button 
+                   className={`hud-btn icon ${showSettings ? 'active' : ''}`} 
+                   onClick={() => setShowSettings(!showSettings)}
+                 >
+                    ⚙️
+                </button>
           </div>
         </div>
       </div>
+      )}
+
+      {/* Dev Settings Overlay */}
+      {enableUI && devMode && (
+          <div className="settings-panel glass-panel dev-settings">
+              <div className="settings-header">
+                  <h3>Dev Settings</h3>
+                  <button className="close-btn" onClick={() => setShowDevSettings(false)}>×</button>
+              </div>
+              
+              <div className="setting-item">
+                  <label>Total Blocks ({totalBlocks})</label>
+                  <input 
+                        type="range" min="5" max="100" step="5"
+                        value={totalBlocks} 
+                        onChange={e => setTotalBlocks(Number(e.target.value))} 
+                    />
+              </div>
+
+              <div className="setting-item">
+                  <label>Phase 2 Duration ({phase2Duration}s)</label>
+                  <input 
+                        type="range" min="10" max="120" step="10"
+                        value={phase2Duration} 
+                        onChange={e => setPhase2Duration(Number(e.target.value))} 
+                    />
+              </div>
+
+              <div className="setting-item">
+                  <label>Simulation Speed ({simulationSpeed}ms)</label>
+                  <input 
+                        type="range" min="50" max="500" step="10"
+                        value={simulationSpeed} 
+                        onChange={e => setSimulationSpeed(Number(e.target.value))} 
+                    />
+              </div>
+          </div>
       )}
 
       {/* Settings Overlay */}
